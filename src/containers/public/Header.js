@@ -1,0 +1,126 @@
+import { useState, React } from "react";
+import Box from "@mui/material/Box";
+import Avatar from "@mui/material/Avatar";
+import Menu from "@mui/material/Menu";
+import MenuItem from "@mui/material/MenuItem";
+import ListItemIcon from "@mui/material/ListItemIcon";
+import Divider from "@mui/material/Divider";
+import IconButton from "@mui/material/IconButton";
+import Typography from "@mui/material/Typography";
+import Tooltip from "@mui/material/Tooltip";
+import PersonAdd from "@mui/icons-material/PersonAdd";
+import Settings from "@mui/icons-material/Settings";
+import Logout from "@mui/icons-material/Logout";
+
+import icons from "../../util/icons";
+
+const { BiSolidHome, BiBell, BsCaretDownFill } = icons;
+
+const Header = () => {
+  const [anchorEl, setAnchorEl] = useState(null);
+  const open = Boolean(anchorEl);
+  const handleClick = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
+  return (
+    <div className="fixed z-[999] top-0 left-0 right-0 w-full h-[60px] bg-white flex font-roboto border-b border-[#CDD1D5] shadow-md">
+      <div className="w-1/2 h-full">
+        <div className="h-full ml-[20%] flex items-center ">
+          <img
+            src="https://firebasestorage.googleapis.com/v0/b/music-ed1de.appspot.com/o/ptit.jpg?alt=media&token=898e4dcb-23ef-4eb7-9fb1-5a40a0277384"
+            alt="logo"
+            className="w-[100px] h-[40px]"
+          />
+          <p className="ml-3">Học viện Công nghệ Bưu chính</p>
+        </div>
+      </div>
+      <div className="w-1/2 h-full">
+        <div className="h-full flex justify-end items-center mr-[20%] gap-8">
+          <div className="flex items-center justify-center gap-1 cursor-pointer">
+            <div>
+              <BiSolidHome size="20px" />
+            </div>
+            <p>Trang chủ</p>
+          </div>
+          <div className="flex items-center justify-center gap-1 cursor-pointer">
+            <div>
+              <BiBell size="20px" />
+            </div>
+            <p>Thông báo</p>
+          </div>
+          <div
+            className="flex items-center justify-center cursor-pointer"
+            onClick={handleClick}
+          >
+            <img
+              className="w-[30px] h-[30px] mr-[4px] rounded-full"
+              src="https://firebasestorage.googleapis.com/v0/b/music-ed1de.appspot.com/o/cho.jpg?alt=media&token=1f9ec7a2-a999-4e5f-8dfa-f1bbe9ca7652"
+              alt="avatar"
+            />
+            <p className="mr-[2px]">Nguyễn Tiến Tài</p>
+            <div>
+              <BsCaretDownFill size="10px" />
+            </div>
+          </div>
+          <Menu
+            anchorEl={anchorEl}
+            id="account-menu"
+            open={open}
+            onClose={handleClose}
+            onClick={handleClose}
+            PaperProps={{
+              elevation: 0,
+              sx: {
+                overflow: "visible",
+                filter: "drop-shadow(0px 2px 8px rgba(0,0,0,0.32))",
+                mt: 1.5,
+                "& .MuiAvatar-root": {
+                  width: 32,
+                  height: 32,
+                  ml: -0.5,
+                  mr: 1,
+                },
+                "&:before": {
+                  content: '""',
+                  display: "block",
+                  position: "absolute",
+                  top: 0,
+                  right: 14,
+                  width: 10,
+                  height: 10,
+                  bgcolor: "background.paper",
+                  transform: "translateY(-50%) rotate(45deg)",
+                  zIndex: 0,
+                },
+              },
+            }}
+            transformOrigin={{ horizontal: "right", vertical: "top" }}
+            anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
+          >
+            <MenuItem onClick={handleClose}>
+              <Avatar /> Thông tin cá nhân
+            </MenuItem>
+            <Divider />
+            <MenuItem onClick={handleClose}>
+              <ListItemIcon>
+                <Settings fontSize="small" />
+              </ListItemIcon>
+              Đổi mật khẩu
+            </MenuItem>
+            <MenuItem onClick={handleClose}>
+              <ListItemIcon>
+                <Logout fontSize="small" />
+              </ListItemIcon>
+              Đăng xuất
+            </MenuItem>
+          </Menu>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default Header;
