@@ -30,14 +30,14 @@ const SubMenu = ({ data }) => {
         }
         className="flex h-0 flex-col pl-14 text-[0.8rem] font-normal overflow-hidden"
       >
-        {data.menus?.map((menu) => (
-          <li key={menu}>
+        {data.menus?.map((menu, index) => (
+          <li key={index}>
             {/* className="hover:text-blue-600 hover:font-medium" */}
             <NavLink
-              to={`/${data.path}/${menu}`}
+              to={`/chuyen-vien/${data?.path}/${menu?.path}`}
               className="link !bg-transparent capitalize"
             >
-              {menu}
+              {menu?.name}
             </NavLink>
           </li>
         ))}

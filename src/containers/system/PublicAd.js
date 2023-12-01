@@ -6,7 +6,7 @@ const PublicAd = () => {
   return (
     <div className="flex gap-5">
       <SidebarAd />
-      <div className="py-4 flex-1 mx-auto max-w-full h-full">
+      <div className="flex-1 mx-auto max-w-full h-full">
         <Outlet />
       </div>
     </div>

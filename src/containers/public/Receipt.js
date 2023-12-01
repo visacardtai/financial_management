@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import Paper from "@mui/material/Paper";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
@@ -8,60 +8,106 @@ import TableHead from "@mui/material/TableHead";
 import TablePagination from "@mui/material/TablePagination";
 import TableRow from "@mui/material/TableRow";
 
-const columns = [
-  { id: "name", label: "Name", minWidth: 170 },
-  { id: "code", label: "ISO\u00a0Code", minWidth: 100 },
-  {
-    id: "population",
-    label: "Population",
-    minWidth: 170,
-    align: "right",
-    format: (value) => value.toLocaleString("en-US"),
-  },
-  {
-    id: "size",
-    label: "Size\u00a0(km\u00b2)",
-    minWidth: 170,
-    align: "right",
-    format: (value) => value.toLocaleString("en-US"),
-  },
-  {
-    id: "density",
-    label: "Density",
-    minWidth: 170,
-    align: "right",
-    format: (value) => value.toFixed(2),
-  },
-];
+import Box from "@mui/material/Box";
+import Collapse from "@mui/material/Collapse";
+import IconButton from "@mui/material/IconButton";
+import Typography from "@mui/material/Typography";
+import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
+import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 
-function createData(name, code, population, size) {
-  const density = population / size;
-  return { name, code, population, size, density };
+import * as apis from "../../apis";
+import * as helpFn from "../../util/HelpFn";
+
+const total = (details) => {
+  let sumCredit = 0;
+  let sumMoney = 0;
+  details?.map((item) => {
+    sumCredit += item?.subject?.creditNum;
+    sumMoney += item?.creditPrice?.price * item?.subject?.creditNum;
+    return 1;
+  });
+  return [sumCredit, sumMoney];
+};
+
+function Row(props) {
+  const { row, index } = props;
+  const [open, setOpen] = React.useState(false);
+
+  return (
+    <React.Fragment>
+      <TableRow sx={{ "& > *": { borderBottom: "unset" } }}>
+        <TableCell>
+          <IconButton
+            aria-label="expand row"
+            size="small"
+            onClick={() => setOpen(!open)}
+          >
+            {open ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
+          </IconButton>
+        </TableCell>
+        <TableCell align="center">{index + 1}</TableCell>
+        <TableCell component="th" scope="row" align="center">
+          {row?.name}
+        </TableCell>
+        <TableCell align="center">
+          {row?.semester?.name + " - " + row?.semester?.year}
+        </TableCell>
+        <TableCell align="center">
+          {helpFn.convertDateFormat(row?.created_date)}
+        </TableCell>
+        <TableCell align="center">
+          {row?.completion_date !== null
+            ? helpFn.convertDateFormat(row?.completion_date)
+            : "Đang xử lý"}
+        </TableCell>
+        <TableCell align="center">
+          {helpFn.converVND(total(row?.expensesDetails)[1])}
+        </TableCell>
+      </TableRow>
+      <TableRow>
+        <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={8}>
+          <Collapse in={open} timeout="auto" unmountOnExit>
+            <Box sx={{ margin: 1 }}>
+              <Typography variant="h6" gutterBottom component="div">
+                Chi tiết hóa đơn
+              </Typography>
+              <Table size="small" aria-label="purchases">
+                <TableHead>
+                  <TableRow>
+                    <TableCell align="left">STT</TableCell>
+                    <TableCell align="left">Tên</TableCell>
+                    <TableCell align="center">Mã</TableCell>
+                    <TableCell align="center">Mô tả</TableCell>
+                    <TableCell align="center">Tổng</TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {row?.expensesDetails?.map((item, index) => (
+                    <TableRow key={index}>
+                      <TableCell component="th" scope="row" align="left">
+                        {index + 1}
+                      </TableCell>
+                      <TableCell>{item?.expensesPrice?.name}</TableCell>
+                      <TableCell align="center">
+                        {item?.expensesPrice?.id}
+                      </TableCell>
+                      <TableCell align="center">
+                        {item?.expensesPrice?.description}
+                      </TableCell>
+                      <TableCell align="center">
+                        {helpFn.converVND(item?.expensesPrice?.price)}
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </Box>
+          </Collapse>
+        </TableCell>
+      </TableRow>
+    </React.Fragment>
+  );
 }
-
-const rows = [
-  createData("India", "IN", 1324171354, 3287263),
-  createData("China", "CN", 1403500365, 9596961),
-  createData("Italy", "IT", 60483973, 301340),
-  createData("United States", "US", 327167434, 9833520),
-  createData("Canada", "CA", 37602103, 9984670),
-  createData("Australia", "AU", 25475400, 7692024),
-  createData("Germany", "DE", 83019200, 357578),
-  createData("Ireland", "IE", 4857000, 70273),
-  createData("Mexico", "MX", 126577691, 1972550),
-  createData("Japan", "JP", 126317000, 377973),
-  createData("France", "FR", 67022000, 640679),
-  createData("United Kingdom", "GB", 67545757, 242495),
-  createData("Russia", "RU", 146793744, 17098246),
-  createData("Nigeria", "NG", 200962417, 923768),
-  createData("Brazil", "BR", 210147125, 8515767),
-  createData("Brazil", "BR", 210147125, 8515767),
-  createData("Brazil", "BR", 210147125, 8515767),
-  createData("Brazil", "BR", 210147125, 8515767),
-  createData("Brazil", "BR", 210147125, 8515767),
-  createData("Brazil", "BR", 210147125, 8515767),
-  createData("Brazil", "BR", 210147125, 8515767),
-];
 
 const Receipt = () => {
   const [page, setPage] = React.useState(0);
@@ -75,69 +121,62 @@ const Receipt = () => {
     setRowsPerPage(+event.target.value);
     setPage(0);
   };
+
+  const [studentExpenses, setStudentExpenses] = useState([]);
+  useEffect(() => {
+    const fetchCheck = async () => {
+      try {
+        const response = await apis.apiGetExpensesByIdStudent(1);
+        console.log(response);
+        if (response?.status === 200) {
+          setStudentExpenses(response?.data);
+          console.log(response?.data);
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    };
+    fetchCheck();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
   return (
-    <div className="flex gap-3 font-roboto">
+    <div className="flex gap-3 font-roboto min-h-screen">
       <div className="w-[100%] bg-white flex flex-col justify-center items-center">
         <div className="flex items-center justify-between mx-5 mt-2 border-b-2 p-2 w-[96%]">
           <div className="text-[22px] font-bold text-main-100">
-            <p>Phiếu Thu Tổng Hợp</p>
+            <p>Khoản chi sinh viên</p>
           </div>
         </div>
-        <div className="w-[96%] m-auto mt-6 min-h-fit">
-          <Paper sx={{ width: "100%", overflow: "hidden" }}>
-            <TableContainer sx={{ maxHeight: 520 }}>
-              <Table stickyHeader aria-label="sticky table">
-                <TableHead>
-                  <TableRow>
-                    {columns.map((column) => (
-                      <TableCell
-                        key={column.id}
-                        align={column.align}
-                        style={{ minWidth: column.minWidth }}
-                      >
-                        {column.label}
-                      </TableCell>
-                    ))}
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {rows
-                    .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                    .map((row) => {
-                      return (
-                        <TableRow
-                          hover
-                          role="checkbox"
-                          tabIndex={-1}
-                          key={row.code}
-                        >
-                          {columns.map((column) => {
-                            const value = row[column.id];
-                            return (
-                              <TableCell key={column.id} align={column.align}>
-                                {column.format && typeof value === "number"
-                                  ? column.format(value)
-                                  : value}
-                              </TableCell>
-                            );
-                          })}
-                        </TableRow>
-                      );
-                    })}
-                </TableBody>
-              </Table>
-            </TableContainer>
-            <TablePagination
-              rowsPerPageOptions={[10, 25, 100]}
-              component="div"
-              count={rows.length}
-              rowsPerPage={rowsPerPage}
-              page={page}
-              onPageChange={handleChangePage}
-              onRowsPerPageChange={handleChangeRowsPerPage}
-            />
-          </Paper>
-          <div className="h-2"></div>
+        <div className="w-[96%] m-auto mt-6">
+          <TableContainer component={Paper}>
+            <Table aria-label="collapsible table">
+              <TableHead>
+                <TableRow>
+                  <TableCell />
+                  <TableCell align="center">STT</TableCell>
+                  <TableCell align="center">Tên khoản chi</TableCell>
+                  <TableCell align="center">Học kỳ</TableCell>
+                  <TableCell align="center">Ngày tạo</TableCell>
+                  <TableCell align="center">Ngày hoàn tất</TableCell>
+                  <TableCell align="center">Tổng</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {studentExpenses?.map((row, index) => (
+                  <Row key={row?.id} row={row} index={index} />
+                ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
+          <TablePagination
+            rowsPerPageOptions={[10, 25, 100]}
+            component="div"
+            count={studentExpenses?.length}
+            rowsPerPage={rowsPerPage}
+            page={page}
+            onPageChange={handleChangePage}
+            onRowsPerPageChange={handleChangeRowsPerPage}
+          />
         </div>
       </div>
     </div>

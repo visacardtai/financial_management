@@ -26,10 +26,15 @@ import DropDown from "../../components/DropDown";
 
 import * as apis from "../../apis";
 import * as helpFn from "../../util/HelpFn";
-
+import { redirect } from "react-router-dom";
+import { useSelector, useDispatch } from "react-redux";
+import * as actions from "../../store/actions";
 const { BiSolidHome, BiBell, BsCaretDownFill } = icons;
 
 const Pay = () => {
+  const { home } = useSelector((state) => state.app);
+  console.log("thanh toan");
+  console.log(home);
   const [age, setAge] = React.useState("Tất cả");
 
   const handleChange = (event) => {
@@ -103,6 +108,20 @@ const Pay = () => {
   const handleClickImgPay = (index, paymethod) => {
     setImgSelect(index);
     setPayMethod(paymethod);
+  };
+
+  const [redirectUrl, setRedirectUrl] = useState("");
+  const handleClickPay = async () => {
+    try {
+      const response = await apis.apiPayment(invoice[0]?.total, invoice[0]?.id);
+      setRedirectUrl(response?.data);
+      if (response?.status === 200) {
+        console.log("abc");
+        window.location.href = response?.data;
+      }
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   return (
@@ -271,15 +290,19 @@ const Pay = () => {
                 <div className="flex flex-col w-full text-[14px]">
                   <div className="flex justify-between border-b-[1px] py-3">
                     <p>Tên giao dịch</p>
-                    <p>abc</p>
+                    <p>Thanh toán học phí</p>
                   </div>
                   <div className="flex justify-between border-b-[1px] py-3">
                     <p>Mã sinh viên</p>
-                    <p>abc</p>
+                    <p>N19DCCN164</p>
                   </div>
                   <div className="flex justify-between border-b-[1px] py-3">
                     <p>Họ tên</p>
-                    <p>abc</p>
+                    <p>Nguyễn Tiến Tài</p>
+                  </div>
+                  <div className="flex justify-between border-b-[1px] py-3">
+                    <p>Ngân hàng</p>
+                    <p>NCB</p>
                   </div>
                   <div className="flex justify-between border-b-[1px] py-3">
                     <p>Phương thức thanh toán</p>
@@ -287,12 +310,14 @@ const Pay = () => {
                   </div>
                   <div className="flex justify-between border-b-[1px] py-3">
                     <p>Tổng tiền</p>
-                    <p>abc</p>
+                    <p>{helpFn.converVND(invoice[0]?.total)}</p>
                   </div>
                 </div>
 
                 <div className="w-full mt-[24px] bg-main-100 py-2 rounded-md text-white hover:bg-main-200">
-                  <button className="w-full">Xử lý thanh toán</button>
+                  <button className="w-full" onClick={handleClickPay}>
+                    Xử lý thanh toán
+                  </button>
                 </div>
               </div>
             </div>
@@ -304,3 +329,20 @@ const Pay = () => {
 };
 
 export default Pay;
+
+// ?vnp_Amount=1000000
+// &vnp_BankCode=NCB
+// &vnp_BankTranNo=20170829152730
+// &vnp_CardType=ATM
+// &vnp_OrderInfo=Thanh+toan+don+hang+thoi+gian%3A+2017-08-29+15%3A27%3A02
+// &vnp_PayDate=20170829153052
+// &vnp_ResponseCode=00
+// &vnp_TmnCode=2QXUI4J4
+// &vnp_TransactionNo=12996460
+// &vnp_TxnRef=23597
+// &vnp_SecureHashType=SHA256
+// &vnp_SecureHash=20081f0ee1cc6b524e273b6d4050fefd
+
+// https://sandbox.vnpayment.vn/tryitnow/Home/VnPayIPN?vnp_Amount=72000000&vnp_BankCode=NCB&vnp_BankTranNo=VNP14167084&vnp_CardType=ATM&vnp_OrderInfo=Thanh+toan+don+hang%3A42707590&vnp_PayDate=20231105004008&vnp_ResponseCode=00&vnp_TmnCode=10N2N7FT&vnp_TransactionNo=14167084&vnp_TxnRef=42707590&vnp_SecureHashType=SHA256&vnp_SecureHash=cf31fd62054c7081a7f7cb15567bd4d104da1be9aa71427409c077f119cd8d553921267c85b9d65b6a3ee014abc6b60bef200ee229eadd0f3b96816b6ff942e1
+
+// https://sandbox.vnpayment.vn/tryitnow/Home/VnPayIPN?vnp_Amount=72000000&vnp_BankCode=NCB&vnp_BankTranNo=VNP14167084&vnp_CardType=ATM&vnp_OrderInfo=Thanh+toan+don+hang%3A42707590&vnp_PayDate=20231105004008&vnp_ResponseCode=00&vnp_TmnCode=10N2N7FT&vnp_TransactionNo=14167084&vnp_TransactionStatus=00&vnp_TxnRef=42707590&vnp_SecureHashType=SHA256&vnp_SecureHash=cf31fd62054c7081a7f7cb15567bd4d104da1be9aa71427409c077f119cd8d553921267c85b9d65b6a3ee014abc6b60bef200ee229eadd0f3b96816b6ff942e1

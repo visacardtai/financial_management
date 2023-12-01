@@ -71,13 +71,24 @@ const SidebarAd = () => {
       name: "giảng viên",
       path: "giang-vien",
       icon: RiBuilding3Line,
-      menus: ["thông tin", "giờ giảng", "bảng giá"],
+      menus: [
+        { name: "Danh Sách", path: "danh-sach" },
+        { name: "Giờ Giảng", path: "gio-giang" },
+        { name: "Bảng Giá", path: "bang-gia" },
+        { name: "Kỳ Giảng Dạy", path: "ky-giang-day" },
+      ],
     },
     {
       name: "sinh viên",
       path: "sinh-vien",
       icon: TbReportAnalytics,
-      menus: ["thông tin", "realtime", "giá phát sinh"],
+      menus: [
+        { name: "Danh Sách", path: "danh-sach" },
+        { name: "Hóa đơn", path: "hoa-don" },
+        { name: "Giá Tín Chỉ", path: "gia-tin-chi" },
+        { name: "Chi Sinh Viên", path: "chi-sinh-vien" },
+        { name: "HĐ-Chi Sinh Viên", path: "hoa-don-chi-sinh-vien" },
+      ],
     },
   ];
 
@@ -100,11 +111,11 @@ const SidebarAd = () => {
       >
         <div className="flex items-center gap-2.5 font-medium border-b py-3 border-slate-300  mx-3">
           <img
-            src="https://img.icons8.com/color/512/firebase.png"
+            // src="https://img.icons8.com/color/512/firebase.png"
             width={45}
             alt=""
           />
-          <span className="text-xl whitespace-pre">Fireball</span>
+          <span className="text-xl whitespace-pre">Quản lý</span>
         </div>
 
         <div className="flex flex-col  h-full">
@@ -112,26 +123,26 @@ const SidebarAd = () => {
             <li>
               <NavLink to={"/"} className="link">
                 <AiOutlineAppstore size={23} className="min-w-max" />
-                All Apps
+                Thông tin
               </NavLink>
             </li>
             <li>
-              <NavLink to={"/nhan-vien/authentication"} className="link">
+              <NavLink to={"/chuyen-vien/nhan-vien"} className="link">
                 <BsPerson size={23} className="min-w-max" />
-                Authentication
+                Nhân viên
               </NavLink>
             </li>
             <li>
-              <NavLink to={"/stroage"} className="link">
+              <NavLink to={"/chuyen-vien/du-lieu"} className="link">
                 <HiOutlineDatabase size={23} className="min-w-max" />
-                Stroage
+                Dữ liệu
               </NavLink>
             </li>
 
             {(open || isTabletMid) && (
               <div className="border-y py-5 border-slate-300 ">
                 <small className="pl-3 text-slate-500 inline-block mb-2">
-                  Product categories
+                  Chức năng
                 </small>
                 {subMenusList?.map((menu) => (
                   <div key={menu.name} className="flex flex-col gap-1">
@@ -143,7 +154,7 @@ const SidebarAd = () => {
             <li>
               <NavLink to={"/settings"} className="link">
                 <SlSettings size={23} className="min-w-max" />
-                Settings
+                Cài đặt
               </NavLink>
             </li>
           </ul>

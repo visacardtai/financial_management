@@ -18,7 +18,7 @@ import autoMergeLevel2 from "redux-persist/lib/stateReconciler/autoMergeLevel2";
 
 const rootReducer = combineReducers({
   app: appReducer,
-  //   music: persistReducer(musicConfig, musicReducer),
+  // music: persistReducer(musicConfig, musicReducer),
 });
 
 export default rootReducer;

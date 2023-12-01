@@ -5,3 +5,6 @@ export { default as Pay } from "./Pay";
 export { default as Debt } from "./Debt";
 export { default as Receipt } from "./Receipt";
 export { default as Pub } from "./Pub";
+export { default as CheckPayment } from "./CheckPayment";
+export { default as SearchInvoice } from "./SearchInvoice";
+export { default as HomeIn } from "./HomeIn";

@@ -2,3 +2,8 @@ export * from "./Public";
 export * from "./Student";
 export * from "./Lecturer";
 export * from "./Admin";
+export * from "./Payment";
+export * from "./ATeachingPeriod";
+export * from "./AInvoice";
+export * from "./AStudentExpenses";
+export * from "./Auth";

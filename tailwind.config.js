@@ -6,6 +6,8 @@ module.exports = {
       backgroundColor: {
         "main-100": "#33B5E5",
         "main-200": "#338BE5",
+        "main-300": "#CED9D9",
+        "overlay-30": "rgba(0,0,0,0.3)",
       },
       textColor: {
         "main-100": "#33B5E5",

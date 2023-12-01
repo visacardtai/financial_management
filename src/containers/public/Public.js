@@ -4,13 +4,22 @@ import { Outlet } from "react-router-dom";
 import icons from "../../util/icons";
 import Header from "./Header";
 import { Sidebar } from "../../components";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import * as apis from "../../apis";
+import * as actions from "../../store/actions";
 
 const { LiaCopyright } = icons;
 
 const Public = () => {
+  const dispatch = useDispatch();
   const { home } = useSelector((state) => state.app);
+  console.log("sinh-vien");
+  console.log(home);
+  useEffect(() => {
+    dispatch(actions.checkRedux(true));
+    console.log("two");
+    console.log(home);
+  }, []);
   return (
     <div className="w-full bg-[#E7ECF0]">
       <div className="w-full h-full">

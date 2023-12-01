@@ -27,28 +27,28 @@ import * as helpFn from "../../util/HelpFn";
 
 const { BiPrinter } = icons;
 
-function createData(name, calories, fat, carbs, protein, price) {
-  return {
-    name,
-    calories,
-    fat,
-    carbs,
-    protein,
-    price,
-    history: [
-      {
-        date: "2020-01-05",
-        customerId: "11091700",
-        amount: 3,
-      },
-      {
-        date: "2020-01-02",
-        customerId: "Anonymous",
-        amount: 1,
-      },
-    ],
-  };
-}
+// function createData(name, calories, fat, carbs, protein, price) {
+//   return {
+//     name,
+//     calories,
+//     fat,
+//     carbs,
+//     protein,
+//     price,
+//     history: [
+//       {
+//         date: "2020-01-05",
+//         customerId: "11091700",
+//         amount: 3,
+//       },
+//       {
+//         date: "2020-01-02",
+//         customerId: "Anonymous",
+//         amount: 1,
+//       },
+//     ],
+//   };
+// }
 const total = (details) => {
   let sumCredit = 0;
   let sumMoney = 0;
@@ -90,9 +90,7 @@ function Row(props) {
           {helpFn.convertDateFormat(row?.date_of_payment)}
         </TableCell>
         <TableCell align="center">{total(row?.invoiceDetails)[0]}</TableCell>
-        <TableCell align="center">
-          {helpFn.converVND(total(row?.invoiceDetails)[1])}
-        </TableCell>
+        <TableCell align="center">{helpFn.converVND(row?.total)}</TableCell>
       </TableRow>
       <TableRow>
         <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={8}>
@@ -207,7 +205,7 @@ const Debt = () => {
   }, []);
 
   return (
-    <div className="flex gap-3 font-roboto">
+    <div className="flex gap-3 font-roboto min-h-screen">
       <div className="w-[100%] bg-white flex flex-col items-center justify-center">
         <div className="flex items-center justify-between mx-5 mt-2 border-b-2 p-2 w-[96%]">
           <div className="text-[22px] font-bold text-main-100">
