@@ -8,12 +8,21 @@ import * as apis from "../../apis";
 import numeral from "numeral";
 import { useDispatch, useSelector } from "react-redux";
 import * as actions from "../../store/actions";
+import useAxiosPrivate from "../../hooks/useAxiosPrivate";
+import { toast } from "react-toastify";
+import pathApis from "../../apis/PathApi";
+import { IoIosPricetags } from "react-icons/io";
 
-const { MdOutlineDriveFileRenameOutline, BiBookmarkAltPlus, BiCheckDouble } =
-  icons;
+const {
+  MdOutlineDriveFileRenameOutline,
+  BiBookmarkAltPlus,
+  BiCheckDouble,
+  LiaCcAmazonPay,
+} = icons;
 
 const FormAddCPrice = () => {
-  const { isBlur } = useSelector((state) => state.app);
+  const axiosPrivate = useAxiosPrivate();
+  const { isBlur, refreshBe } = useSelector((state) => state.app);
   const dispatch = useDispatch();
   const [itemBranch, setItemBranch] = React.useState(1);
   const [study, setStudy] = React.useState(0);
@@ -51,7 +60,7 @@ const FormAddCPrice = () => {
   useEffect(() => {
     const fetchApi = async () => {
       try {
-        const response = await apis.apiGetAllBranch();
+        const response = await apis.apiGetAllBranch(axiosPrivate);
         if (response?.status === 200) {
           setBranch(response?.data);
         }
@@ -67,16 +76,16 @@ const FormAddCPrice = () => {
     const fetchApi = async () => {
       try {
         const price = Number(inputValue.replace(/,/g, ""));
-        const response = await apis.apiAddCreditPrice(
-          name,
-          study,
-          price,
-          itemBranch
-        );
+        const data = { name, price, type: study, branch_id: itemBranch };
+        const response = await apis.apiAddCreditPrice(axiosPrivate, data);
         if (response?.status === 200) {
+          toast.success("Thêm dữ liệu thành công");
+          dispatch(actions.refreshBe(!refreshBe));
+          dispatch(actions.checkBlur(!isBlur));
           console.log("success");
         }
       } catch (error) {
+        toast.error("Thêm dữ liệu thất bại");
         console.log(error);
       }
     };
@@ -91,7 +100,7 @@ const FormAddCPrice = () => {
       <div className="h-[80%] flex flex-col items-center gap-4">
         <div className="bg-sky-400 w-full rounded-t-xl">
           <h5 className="font-medium text-[20px] my-[20px]">
-            Thêm Giá Tín Chỉ
+            Tạo Giá Tín Chỉ Mới
           </h5>
         </div>
         <div className="flex justify-start items-center w-[50%] gap-2 mt-1">
@@ -149,15 +158,15 @@ const FormAddCPrice = () => {
         </div>
         <div className="flex justify-start items-center w-[50%] gap-2">
           <div className="flex w-[30%] gap-2">
-            <MdOutlineDriveFileRenameOutline size={24} />
-            <p>Tên giá</p>
+            <IoIosPricetags size={24} />
+            <p>Số tiền</p>
           </div>
           {/* type="text"
             placeholder="Tên giá"
             className="ml-2 px-1 py-2 w-[200px] border rounded-md"
             value={inputValue} */}
           <input
-            placeholder="Tên giá"
+            placeholder="Số tiền"
             className="ml-2 px-1 py-2 w-[200px] border rounded-md"
             type="text"
             onChange={handleChangeAmount}
@@ -165,8 +174,8 @@ const FormAddCPrice = () => {
         </div>
         <div className="flex justify-start items-center w-[50%] gap-2">
           <div className="flex w-[30%] gap-2">
-            <MdOutlineDriveFileRenameOutline size={24} />
-            <p>Số tiền</p>
+            <LiaCcAmazonPay size={24} />
+            <p>Tổng tiền</p>
           </div>
           <span className="ml-2 px-1 py-2 w-[200px]">{inputValue}</span>
         </div>

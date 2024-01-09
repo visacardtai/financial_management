@@ -72,7 +72,8 @@ function Row(props) {
                     <TableCell align="left">Mã</TableCell>
                     <TableCell align="left">Tên</TableCell>
                     <TableCell align="center">Ngày dạy</TableCell>
-                    <TableCell align="center">Số tiết</TableCell>
+                    <TableCell align="center">Số tiết lý thuyết</TableCell>
+                    <TableCell align="center">Số tiết thực hành</TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
@@ -86,6 +87,7 @@ function Row(props) {
                         {helpFn.convertDateFormat(item?.attendance)}
                       </TableCell>
                       <TableCell align="center">{item?.quantity}</TableCell>
+                      <TableCell align="center">{item?.practical}</TableCell>
                     </TableRow>
                   ))}
                 </TableBody>

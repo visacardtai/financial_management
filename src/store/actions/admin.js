@@ -34,3 +34,9 @@ export const getDataEditTeachingPeriod = (data) => ({
   type: actionTypes.EDITTEACHINGPERIOD,
   data,
 });
+
+// upload file excel
+export const setTypeUpload = (data) => ({
+  type: actionTypes.TYPEUPLOAD,
+  data,
+});

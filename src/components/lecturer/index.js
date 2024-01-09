@@ -3,3 +3,8 @@ export { default as ReviewCardLec } from "./ReviewCardLec";
 export { default as AllTargets } from "./AllTargets";
 export { default as AllPrice } from "./AllPrice";
 export { default as AllTeachingDetails } from "./AllTeachingDetails";
+export { default as SidebarLec } from "./SidebarLec";
+export { default as SubMenuLec } from "./SubMenuLec";
+export { default as DropDownLec } from "./DropDownLec";
+export { default as InforLecturer } from "./InforLecturer";
+export { default as Calculate } from "./Calculate";

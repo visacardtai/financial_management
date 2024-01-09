@@ -1,11 +1,10 @@
 import axios from "../axios";
+const token = localStorage.getItem("token");
 
-export const apiGetCreditPriceByStatus = (status) =>
+export const apiGetCreditPriceByStatus = (axiosPrivate, status) =>
   new Promise(async (resolve, reject) => {
     try {
-      const response = await axios({
-        url: "/credit-price",
-        method: "get",
+      const response = await axiosPrivate.get("/expert/credit-price", {
         params: { status },
       });
       resolve(response);
@@ -14,40 +13,35 @@ export const apiGetCreditPriceByStatus = (status) =>
     }
   });
 
-export const apiGetAllBranch = () =>
+export const apiGetAllBranch = (axiosPrivate) =>
   new Promise(async (resolve, reject) => {
     try {
-      const response = await axios({
-        url: "/branch",
-        method: "get",
-      });
+      const response = await axiosPrivate.get("/expert/branch");
       resolve(response);
     } catch (error) {
       reject(error);
     }
   });
 
-export const apiAddCreditPrice = (name, study, price, itemBranch) =>
+export const apiAddCreditPrice = (axiosPrivate, data) =>
   new Promise(async (resolve, reject) => {
     try {
-      const response = await axios({
-        url: "/credit-price",
-        method: "post",
-        data: { name, price, type: study, branch_id: itemBranch },
-      });
+      const response = await axiosPrivate.post(
+        "/expert/credit-price",
+        JSON.stringify(data)
+      );
       resolve(response);
     } catch (error) {
       reject(error);
     }
   });
 
-export const apiDeleteCreditPrice = (data) =>
+export const apiDeleteCreditPrice = (axiosPrivate, data) =>
   new Promise(async (resolve, reject) => {
     try {
-      const response = await axios({
-        url: "/credit-price",
-        method: "delete",
-        data: data,
+      console.log("ahdsdsds " + data);
+      const response = await axiosPrivate.delete("/expert/credit-price", {
+        data,
       });
       resolve(response);
     } catch (error) {
@@ -56,12 +50,10 @@ export const apiDeleteCreditPrice = (data) =>
   });
 
 // Api Expenses Price with role admin
-export const apiGetExpPriceByStatus = (status) =>
+export const apiGetExpPriceByStatus = (axiosPrivate, status) =>
   new Promise(async (resolve, reject) => {
     try {
-      const response = await axios({
-        url: "/expenses-price",
-        method: "get",
+      const response = await axiosPrivate.get("/expert/expenses-price", {
         params: { status },
       });
       resolve(response);
@@ -70,27 +62,34 @@ export const apiGetExpPriceByStatus = (status) =>
     }
   });
 
-export const apiAddExPrice = (name, price, description) =>
+export const apiGetExpPriceNew = (axiosPrivate) =>
   new Promise(async (resolve, reject) => {
     try {
-      const response = await axios({
-        url: "/expenses-price",
-        method: "post",
-        data: { name, price, description },
-      });
+      const response = await axiosPrivate.get("/expert/expenses-price/news");
       resolve(response);
     } catch (error) {
       reject(error);
     }
   });
 
-export const apiDeleteExPrice = (data) =>
+export const apiAddExPrice = (axiosPrivate, data) =>
   new Promise(async (resolve, reject) => {
     try {
-      const response = await axios({
-        url: "/expenses-price",
-        method: "delete",
-        data: data,
+      const response = await axiosPrivate.post(
+        "/expert/expenses-price",
+        JSON.stringify(data)
+      );
+      resolve(response);
+    } catch (error) {
+      reject(error);
+    }
+  });
+
+export const apiDeleteExPrice = (axiosPrivate, data) =>
+  new Promise(async (resolve, reject) => {
+    try {
+      const response = await axiosPrivate.delete("/expert/expenses-price", {
+        data,
       });
       resolve(response);
     } catch (error) {
@@ -99,12 +98,10 @@ export const apiDeleteExPrice = (data) =>
   });
 
 // Api Targets with role admin
-export const apiGetTargetsByStatus = (status) =>
+export const apiGetTargetsByStatus = (axiosPrivate, status) =>
   new Promise(async (resolve, reject) => {
     try {
-      const response = await axios({
-        url: "/targets",
-        method: "get",
+      const response = await axiosPrivate.get("/expert/targets", {
         params: { status },
       });
       resolve(response);
@@ -113,28 +110,23 @@ export const apiGetTargetsByStatus = (status) =>
     }
   });
 
-export const apiAddTargets = (name, quantity, description) =>
+export const apiAddTargets = (axiosPrivate, data) =>
   new Promise(async (resolve, reject) => {
     try {
-      const response = await axios({
-        url: "/targets",
-        method: "post",
-        data: { name, quantity, description },
-      });
+      const response = await axiosPrivate.post(
+        "/expert/targets",
+        JSON.stringify(data)
+      );
       resolve(response);
     } catch (error) {
       reject(error);
     }
   });
 
-export const apiDeleteTargets = (data) =>
+export const apiDeleteTargets = (axiosPrivate, data) =>
   new Promise(async (resolve, reject) => {
     try {
-      const response = await axios({
-        url: "/targets",
-        method: "delete",
-        data: data,
-      });
+      const response = await axiosPrivate.delete("/expert/targets", { data });
       resolve(response);
     } catch (error) {
       reject(error);
@@ -142,12 +134,10 @@ export const apiDeleteTargets = (data) =>
   });
 
 // Api LecturePrice with role admin
-export const apiGetLecturePriceByStatus = (status) =>
+export const apiGetLecturePriceByStatus = (axiosPrivate, status) =>
   new Promise(async (resolve, reject) => {
     try {
-      const response = await axios({
-        url: "/lecture-price",
-        method: "get",
+      const response = await axiosPrivate.get("/lecturer/lecture-price", {
         params: { status },
       });
       resolve(response);
@@ -156,13 +146,24 @@ export const apiGetLecturePriceByStatus = (status) =>
     }
   });
 
-export const apiAddLecturePrice = (name, coefficient, price, description) =>
+export const apiAddLecturePrice = (axiosPrivate, data) =>
   new Promise(async (resolve, reject) => {
     try {
-      const response = await axios({
-        url: "/lecture-price",
-        method: "post",
-        data: { name, basic_price: price, coefficient, description },
+      const response = await axiosPrivate.post(
+        "/expert/lecture-price",
+        JSON.stringify(data)
+      );
+      resolve(response);
+    } catch (error) {
+      reject(error);
+    }
+  });
+
+export const apiDeleteLecturePrice = (axiosPrivate, data) =>
+  new Promise(async (resolve, reject) => {
+    try {
+      const response = await axiosPrivate.delete("/expert/lecture-price", {
+        data,
       });
       resolve(response);
     } catch (error) {
@@ -170,16 +171,6 @@ export const apiAddLecturePrice = (name, coefficient, price, description) =>
     }
   });
 
-export const apiDeleteLecturePrice = (data) =>
-  new Promise(async (resolve, reject) => {
-    try {
-      const response = await axios({
-        url: "/lecture-price",
-        method: "delete",
-        data: data,
-      });
-      resolve(response);
-    } catch (error) {
-      reject(error);
-    }
-  });
+// 9704198526191432198
+// NGUYEN VAN A
+// 07/15

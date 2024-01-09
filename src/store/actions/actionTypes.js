@@ -1,6 +1,17 @@
 const actionTypes = {
+  // Check
+  REFRESHFE: "REFRESHFE",
+  LOADING: "LOADING",
+
+  IDUSER: "IDUSER",
+  INFOUSER: "INFOUSER",
   HOME: "HOME",
   ISLOGIN: "ISLOGIN",
+  SETROLE: "SETROLE",
+
+  // Lecturer
+  DATACALCULATE: "DATACALCULATE",
+
   // admin
   ISBLUR: "ISBLUR",
   TYPEDELETE: "TYPEDELETE",
@@ -9,6 +20,9 @@ const actionTypes = {
   EDITSTUDENTEXPENSES: "EDITSTUDENTEXPENSES",
   EDITINVOICE: "EDITINVOIC",
   EDITTEACHINGPERIOD: "EDITTEACHINGPERIOD",
+
+  // upload file Excel
+  TYPEUPLOAD: "TYPEUPLOAD",
 };
 
 export default actionTypes;

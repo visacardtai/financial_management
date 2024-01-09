@@ -32,9 +32,8 @@ import * as actions from "../../store/actions";
 const { BiSolidHome, BiBell, BsCaretDownFill } = icons;
 
 const Pay = () => {
-  const { home } = useSelector((state) => state.app);
-  console.log("thanh toan");
-  console.log(home);
+  const { home, idUser, infoUser } = useSelector((state) => state.app);
+  const [checkInvoice, setCheckInvoice] = useState(false);
   const [age, setAge] = React.useState("Tất cả");
 
   const handleChange = (event) => {
@@ -78,11 +77,13 @@ const Pay = () => {
   useEffect(() => {
     const fetchCheck = async () => {
       try {
-        const response = await apis.apiGetInvoiceByStatus(1, 0);
+        const response = await apis.apiGetInvoiceByStatus(idUser, 0);
         console.log(response);
         if (response?.status === 200) {
           setInvoice(response?.data);
-          console.log(response?.data);
+          if (response?.data?.length > 0) {
+            setCheckInvoice(true);
+          }
         }
       } catch (error) {
         console.log(error);
@@ -254,75 +255,79 @@ const Pay = () => {
             4. Khuyến cáo thanh toán qua các loại thẻ ATM nội địa, QR-Code.
           </p>
         </div>
-        <div className="w-[96%] my-10 flex">
-          <div className="w-1/2 flex flex-col gap-1 justify-center items-center border-r-[3px]">
-            <img
-              src="https://firebasestorage.googleapis.com/v0/b/music-ed1de.appspot.com/o/vnpay.png?alt=media&token=206c992b-3912-4f67-91c2-6d9918630667&_gl=1*1g6bpxr*_ga*Njk0MjA5MDAzLjE2OTgwODYwNjA.*_ga_CW55HF8NVT*MTY5ODYwMjQ3OS41LjEuMTY5ODYwMjU3Mi42MC4wLjA."
-              alt="vnpay"
-              className={`w-[160px] h-[90px] border-[2px] hover:border-red-600 ${
-                imgSelect === 1 ? "border-red-600" : ""
-              }`}
-              onClick={() => handleClickImgPay(1, "VnPay")}
-            />
-            <img
-              src="https://firebasestorage.googleapis.com/v0/b/music-ed1de.appspot.com/o/qrcode.png?alt=media&token=8103cbb2-4a74-4a54-8fc9-eeeb62fd1a9f&_gl=1*eripvy*_ga*Njk0MjA5MDAzLjE2OTgwODYwNjA.*_ga_CW55HF8NVT*MTY5ODYwMjQ3OS41LjEuMTY5ODYwMzA2My40OS4wLjA."
-              alt="qrcode"
-              className={`w-[160px] h-[90px] border-[2px] hover:border-red-600 ${
-                imgSelect === 2 ? "border-red-600" : ""
-              }`}
-              onClick={() => handleClickImgPay(2, "QR-Code")}
-            />
-            <img
-              src="https://firebasestorage.googleapis.com/v0/b/music-ed1de.appspot.com/o/atm.png?alt=media&token=5aa6d6ee-b948-45eb-97a0-9353ef44e787&_gl=1*doqkj1*_ga*Njk0MjA5MDAzLjE2OTgwODYwNjA.*_ga_CW55HF8NVT*MTY5ODYwMjQ3OS41LjEuMTY5ODYwMjYyMC4xMi4wLjA."
-              alt="atm"
-              className={`w-[160px] h-[90px] border-[2px] hover:border-red-600 ${
-                imgSelect === 3 ? "border-red-600" : ""
-              }`}
-              onClick={() => handleClickImgPay(3, "Ngân hàng")}
-            />
-          </div>
-          {imgSelect !== null && (
-            <div className="w-1/2 flex items-center justify-center">
-              <div className="w-[400px] flex flex-col items-start">
-                <p className="w-full border-b-[1px] flex items-center justify-center py-3 font-semibold">
-                  Chi tiết giao dịch
-                </p>
-                <div className="flex flex-col w-full text-[14px]">
-                  <div className="flex justify-between border-b-[1px] py-3">
-                    <p>Tên giao dịch</p>
-                    <p>Thanh toán học phí</p>
+        {checkInvoice ? (
+          <div className="w-[96%] my-10 flex">
+            <div className="w-1/2 flex flex-col gap-1 justify-center items-center border-r-[3px]">
+              <img
+                src="https://firebasestorage.googleapis.com/v0/b/music-ed1de.appspot.com/o/vnpay.png?alt=media&token=206c992b-3912-4f67-91c2-6d9918630667&_gl=1*1g6bpxr*_ga*Njk0MjA5MDAzLjE2OTgwODYwNjA.*_ga_CW55HF8NVT*MTY5ODYwMjQ3OS41LjEuMTY5ODYwMjU3Mi42MC4wLjA."
+                alt="vnpay"
+                className={`w-[160px] h-[90px] border-[2px] hover:border-red-600 ${
+                  imgSelect === 1 ? "border-red-600" : ""
+                }`}
+                onClick={() => handleClickImgPay(1, "VnPay")}
+              />
+              <img
+                src="https://firebasestorage.googleapis.com/v0/b/music-ed1de.appspot.com/o/qrcode.png?alt=media&token=8103cbb2-4a74-4a54-8fc9-eeeb62fd1a9f&_gl=1*eripvy*_ga*Njk0MjA5MDAzLjE2OTgwODYwNjA.*_ga_CW55HF8NVT*MTY5ODYwMjQ3OS41LjEuMTY5ODYwMzA2My40OS4wLjA."
+                alt="qrcode"
+                className={`w-[160px] h-[90px] border-[2px] hover:border-red-600 ${
+                  imgSelect === 2 ? "border-red-600" : ""
+                }`}
+                onClick={() => handleClickImgPay(2, "QR-Code")}
+              />
+              <img
+                src="https://firebasestorage.googleapis.com/v0/b/music-ed1de.appspot.com/o/atm.png?alt=media&token=5aa6d6ee-b948-45eb-97a0-9353ef44e787&_gl=1*doqkj1*_ga*Njk0MjA5MDAzLjE2OTgwODYwNjA.*_ga_CW55HF8NVT*MTY5ODYwMjQ3OS41LjEuMTY5ODYwMjYyMC4xMi4wLjA."
+                alt="atm"
+                className={`w-[160px] h-[90px] border-[2px] hover:border-red-600 ${
+                  imgSelect === 3 ? "border-red-600" : ""
+                }`}
+                onClick={() => handleClickImgPay(3, "Ngân hàng")}
+              />
+            </div>
+            {imgSelect !== null && (
+              <div className="w-1/2 flex items-center justify-center">
+                <div className="w-[400px] flex flex-col items-start">
+                  <p className="w-full border-b-[1px] flex items-center justify-center py-3 font-semibold">
+                    Chi tiết giao dịch
+                  </p>
+                  <div className="flex flex-col w-full text-[14px]">
+                    <div className="flex justify-between border-b-[1px] py-3">
+                      <p>Tên giao dịch</p>
+                      <p>Thanh toán học phí</p>
+                    </div>
+                    <div className="flex justify-between border-b-[1px] py-3">
+                      <p>Mã sinh viên</p>
+                      <p>{idUser}</p>
+                    </div>
+                    <div className="flex justify-between border-b-[1px] py-3">
+                      <p>Họ tên</p>
+                      <p>{infoUser?.fullname}</p>
+                    </div>
+                    <div className="flex justify-between border-b-[1px] py-3">
+                      <p>Ngân hàng</p>
+                      <p>NCB</p>
+                    </div>
+                    <div className="flex justify-between border-b-[1px] py-3">
+                      <p>Phương thức thanh toán</p>
+                      <p>{payMethod}</p>
+                    </div>
+                    <div className="flex justify-between border-b-[1px] py-3">
+                      <p>Tổng tiền</p>
+                      <p>{helpFn.converVND(invoice[0]?.total)}</p>
+                    </div>
                   </div>
-                  <div className="flex justify-between border-b-[1px] py-3">
-                    <p>Mã sinh viên</p>
-                    <p>N19DCCN164</p>
-                  </div>
-                  <div className="flex justify-between border-b-[1px] py-3">
-                    <p>Họ tên</p>
-                    <p>Nguyễn Tiến Tài</p>
-                  </div>
-                  <div className="flex justify-between border-b-[1px] py-3">
-                    <p>Ngân hàng</p>
-                    <p>NCB</p>
-                  </div>
-                  <div className="flex justify-between border-b-[1px] py-3">
-                    <p>Phương thức thanh toán</p>
-                    <p>{payMethod}</p>
-                  </div>
-                  <div className="flex justify-between border-b-[1px] py-3">
-                    <p>Tổng tiền</p>
-                    <p>{helpFn.converVND(invoice[0]?.total)}</p>
-                  </div>
-                </div>
 
-                <div className="w-full mt-[24px] bg-main-100 py-2 rounded-md text-white hover:bg-main-200">
-                  <button className="w-full" onClick={handleClickPay}>
-                    Xử lý thanh toán
-                  </button>
+                  <div className="w-full mt-[24px] bg-main-100 py-2 rounded-md text-white hover:bg-main-200">
+                    <button className="w-full" onClick={handleClickPay}>
+                      Xử lý thanh toán
+                    </button>
+                  </div>
                 </div>
               </div>
-            </div>
-          )}
-        </div>
+            )}
+          </div>
+        ) : (
+          <div className="h-[220px]"></div>
+        )}
       </div>
     </div>
   );

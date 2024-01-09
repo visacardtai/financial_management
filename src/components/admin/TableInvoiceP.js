@@ -20,6 +20,9 @@ import * as apis from "../../apis";
 import * as helpFn from "../../util/HelpFn";
 import { useDispatch, useSelector } from "react-redux";
 import * as actions from "../../store/actions";
+import useAxiosPrivate from "../../hooks/useAxiosPrivate";
+import icons from "../../util/icons";
+const { GoSearch } = icons;
 
 function createData(id, name, calories, fat, carbs, protein) {
   return {
@@ -228,6 +231,8 @@ EnhancedTableToolbar.propTypes = {
 };
 
 const TableInvoiceP = () => {
+  const { role, refreshBe } = useSelector((state) => state.app);
+  const axiosPrivate = useAxiosPrivate();
   const { isBlur } = useSelector((state) => state.app);
   const [order, setOrder] = React.useState("asc");
   const [orderBy, setOrderBy] = React.useState("calories");
@@ -235,22 +240,31 @@ const TableInvoiceP = () => {
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(5);
   const [expPrice, setExpPrice] = useState([]);
+  const [dataSearch, setDataSearch] = useState([]);
+  const [inputValue, setInputValue] = useState("");
+
   const dispatch = useDispatch();
 
   useEffect(() => {
     const fetchApi = async () => {
       try {
-        const response = await apis.apiGetAllInvoice(0, 0);
+        const response = await apis.apiGetAllInvoice(axiosPrivate, 0, 0);
         if (response?.status === 200) {
           console.log(response);
           setExpPrice(response?.data);
+
+          const filteredStudents = response?.data?.filter((item) =>
+            item?.name.toLowerCase().includes(inputValue.toLowerCase())
+          );
+          setDataSearch(filteredStudents);
         }
       } catch (error) {
         console.log(error);
       }
     };
     fetchApi();
-  }, []);
+    setSelected([]);
+  }, [refreshBe]);
 
   const handleRequestSort = (event, property) => {
     const isAsc = orderBy === property && order === "asc";
@@ -303,11 +317,11 @@ const TableInvoiceP = () => {
 
   const visibleRows = React.useMemo(
     () =>
-      stableSort(expPrice, getComparator(order, orderBy)).slice(
+      stableSort(dataSearch, getComparator(order, orderBy)).slice(
         page * rowsPerPage,
         page * rowsPerPage + rowsPerPage
       ),
-    [order, orderBy, page, rowsPerPage, expPrice]
+    [order, orderBy, page, rowsPerPage, dataSearch]
   );
 
   const handleAdd = () => {
@@ -316,6 +330,7 @@ const TableInvoiceP = () => {
   };
 
   const handleAddMore = () => {
+    dispatch(actions.setTypeUpload(1));
     dispatch(actions.changeTypeBlur(6));
     dispatch(actions.checkBlur(!isBlur));
   };
@@ -331,29 +346,90 @@ const TableInvoiceP = () => {
     }
   };
 
+  const handleCensor = () => {
+    if (selected.length !== 0) {
+      dispatch(actions.changeTypeBlur(1));
+      dispatch(actions.changeTypeDelete(12));
+      dispatch(actions.checkBlur(!isBlur));
+      dispatch(actions.listDelete(selected));
+    } else {
+      console.log("Non");
+    }
+  };
+
+  const handleChangeInput = (event) => {
+    setInputValue(event.target.value);
+  };
+  const handlePrint = () => {
+    const filteredStudents = expPrice.filter((item) =>
+      item?.student_name.toLowerCase().includes(inputValue.toLowerCase())
+    );
+    setDataSearch(filteredStudents);
+  };
+
+  useEffect(() => {
+    handlePrint();
+  }, [inputValue]);
+
   return (
     <div className="w-full flex flex-col items-center relative font-roboto">
-      <div className="absolute right-[5%] top-[-55px] flex gap-3">
-        <button
-          onClick={handleAddMore}
-          className="bg-[#61f461] hover:bg-[#56fb56] w-[90px] h-[30px] rounded-xl text-white"
-        >
-          Thêm nhiều
-        </button>
-        <button
-          onClick={handleAdd}
-          className="bg-[#61f461] hover:bg-[#56fb56] w-[80px] h-[30px] rounded-xl text-white"
-        >
-          Thêm
-        </button>
-        <button
-          onClick={handlDelete}
-          className="bg-[#FF4500] hover:bg-[#ff7644] w-[80px] h-[30px] rounded-xl text-white"
-        >
-          Xóa
-        </button>
-        {/* <button className="">Edit</button> */}
-      </div>
+      {role?.find((item) => item === "ROLE_QUANLY") ? (
+        <div className="absolute right-[5%] top-[-55px] flex gap-3 items-center justify-center">
+          <div className="flex gap-2 justify-center items-center">
+            <div className="bg-[#f8fbfd] flex items-center justify-center border px-2 gap-2 rounded-full">
+              <GoSearch size={24} />
+              <input
+                className="py-2 bg-[#f8fbfd] focus:outline-none"
+                type="text"
+                placeholder="Nhập mã sinh viên"
+                value={inputValue}
+                onChange={handleChangeInput}
+              />
+            </div>
+          </div>
+          <button
+            onClick={handleAddMore}
+            className="bg-[#61f461] hover:bg-[#56fb56] w-[90px] h-[30px] rounded-xl text-white"
+          >
+            Thêm nhiều
+          </button>
+          <button
+            onClick={handleAdd}
+            className="bg-[#61f461] hover:bg-[#56fb56] w-[80px] h-[30px] rounded-xl text-white"
+          >
+            Thêm
+          </button>
+          <button
+            onClick={handlDelete}
+            className="bg-[#FF4500] hover:bg-[#ff7644] w-[80px] h-[30px] rounded-xl text-white"
+          >
+            Xóa
+          </button>
+          {/* <button className="">Edit</button> */}
+        </div>
+      ) : (
+        <div className="absolute right-[5%] top-[-55px] flex gap-3 items-center justify-center">
+          <div className="flex gap-2 justify-center items-center">
+            <div className="bg-[#f8fbfd] flex items-center justify-center border px-2 gap-2 rounded-full">
+              <GoSearch size={24} />
+              <input
+                className="py-2 bg-[#f8fbfd] focus:outline-none"
+                type="text"
+                placeholder="Nhập mã sinh viên"
+                value={inputValue}
+                onChange={handleChangeInput}
+              />
+            </div>
+          </div>
+          <button
+            onClick={handleCensor}
+            className="bg-[#61f461] hover:bg-[#56fb56] w-[80px] h-[30px] rounded-xl text-white"
+          >
+            Duyệt
+          </button>
+        </div>
+      )}
+
       <div className="w-[90%]">
         <Box sx={{ width: "100%" }}>
           <Paper sx={{ width: "100%", mb: 2 }}>
@@ -369,7 +445,7 @@ const TableInvoiceP = () => {
                   orderBy={orderBy}
                   onSelectAllClick={handleSelectAllClick}
                   onRequestSort={handleRequestSort}
-                  rowCount={expPrice.length}
+                  rowCount={dataSearch.length}
                 />
                 <TableBody>
                   {visibleRows?.map((row, index) => {
@@ -422,7 +498,7 @@ const TableInvoiceP = () => {
             <TablePagination
               rowsPerPageOptions={[5, 10, 15]}
               component="div"
-              count={expPrice.length}
+              count={dataSearch.length}
               rowsPerPage={rowsPerPage}
               page={page}
               onPageChange={handleChangePage}

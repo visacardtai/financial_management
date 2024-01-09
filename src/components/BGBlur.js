@@ -4,6 +4,8 @@ import { useDispatch, useSelector } from "react-redux";
 import AllTargets from "./lecturer/AllTargets";
 import AllPrice from "./lecturer/AllPrice";
 import AllTeachingDetails from "./lecturer/AllTeachingDetails";
+import Calculate from "./lecturer/Calculate";
+
 // import * as actions from "../store/actions";
 
 const { AiOutlineClose } = icons;
@@ -19,7 +21,7 @@ const BGBlur = ({ data, onDataChange, item, allTeachingDetails }) => {
       {data && (
         <div className="fixed w-[80%] h-[90%] bg-overlay-30 z-50 flex justify-center items-center">
           <div className="bg-white flex w-[80%] h-[70%] rounded-md relative">
-            <div className="w-[100%] h-full flex items-center justify-center">
+            <div className="w-[100%] h-full flex mt-[8px] justify-center">
               {item === 1 ? (
                 <AllTargets />
               ) : item === 2 ? (
@@ -27,7 +29,7 @@ const BGBlur = ({ data, onDataChange, item, allTeachingDetails }) => {
               ) : item === 3 ? (
                 <AllTeachingDetails data={allTeachingDetails} />
               ) : (
-                "4"
+                <Calculate />
               )}
               {/* className="cursor-pointer flex-1 flex justify-end" */}
             </div>

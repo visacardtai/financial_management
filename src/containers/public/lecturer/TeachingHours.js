@@ -4,6 +4,9 @@ import * as apis from "../../../apis";
 import * as helpFn from "../../../util/HelpFn";
 import ChartSubject from "../../../components/lecturer/ChartSubject";
 import BGBlur from "../../../components/BGBlur";
+import useAxiosPrivate from "../../../hooks/useAxiosPrivate";
+import { useDispatch, useSelector } from "react-redux";
+import * as actions from "../../../store/actions";
 
 const {
   TbClockStar,
@@ -14,6 +17,9 @@ const {
 } = icons;
 
 const TeachingHours = () => {
+  const dispatch = useDispatch();
+  const { idUser } = useSelector((state) => state.app);
+  const axiosPrivate = useAxiosPrivate();
   const [teachingPeriod, setTeachingPeriod] = useState(null);
   const [classCoefficient, setClassCoefficient] = useState(null);
   const [select, setSelect] = useState(false);
@@ -27,10 +33,24 @@ const TeachingHours = () => {
   useEffect(() => {
     const fetchTeachingPeriod = async () => {
       try {
-        const response = await apis.apiGetNewTPByIdLecture(1);
+        const response = await apis.apiGetNewTPByIdLecture(
+          axiosPrivate,
+          idUser
+        );
         if (response?.status === 200) {
+          console.log("nfnsjsjfjdfjd");
           setTeachingPeriod(response?.data);
           console.log(response?.data);
+          dispatch(
+            actions.setDataCalculate({
+              targets: response?.data?.targets?.quantity,
+              price: response?.data?.lecturePrice?.basic_price,
+              coefficient: response?.data?.lecturePrice?.coefficient,
+              details: response?.data?.details,
+              total: response?.data?.total,
+              sp_total: response?.data?.total_price,
+            })
+          );
         }
       } catch (error) {
         console.log(error);
@@ -42,7 +62,7 @@ const TeachingHours = () => {
   useEffect(() => {
     const fetchClassCoefficient = async () => {
       try {
-        const response = await apis.apiGetAllClassCoefficient(1);
+        const response = await apis.apiGetAllClassCoefficient(axiosPrivate);
         if (response?.status === 200) {
           setClassCoefficient(response?.data);
           console.log(response?.data);
@@ -59,7 +79,7 @@ const TeachingHours = () => {
       <div className="w-[100%] bg-white flex flex-col justify-center items-center">
         <div className="flex items-center justify-between mx-5 mt-2 border-b-2 p-2 w-[96%] mb-[12px]">
           <div className="text-[22px] font-bold text-main-100">
-            <p>Thông Tin Giờ Giảng</p>
+            <p>Thông Tin Kỳ Dạy</p>
           </div>
           <div className="flex gap-2 justify-center items-center"></div>
         </div>
@@ -142,7 +162,7 @@ const TeachingHours = () => {
                     <div className="w-1/2 flex flex-col items-center justify-center gap-2">
                       <p className="text-15px] font-light">Số tiết đã dạy</p>
                       <p className="text-[26px] font-medium">
-                        {teachingPeriod?.total} tiết
+                        {teachingPeriod?.total?.toFixed(2)} tiết
                       </p>
                     </div>
                     <div className="flex flex-col w-1/2 justify-center items-center gap-2">
@@ -182,8 +202,10 @@ const TeachingHours = () => {
                       <p className="text-[26px] font-medium">
                         {teachingPeriod?.total >
                         teachingPeriod?.targets?.quantity
-                          ? teachingPeriod?.total -
-                            teachingPeriod?.targets?.quantity
+                          ? (
+                              teachingPeriod?.total -
+                              teachingPeriod?.targets?.quantity
+                            )?.toFixed(2)
                           : "0"}{" "}
                         tiết
                       </p>
@@ -199,7 +221,7 @@ const TeachingHours = () => {
                     </div>
                   </div>
                   <div className="flex flex-col ml-3 my-3">
-                    {classCoefficient?.map((item) => (
+                    {classCoefficient?.slice(0, 3)?.map((item) => (
                       <div className="w-full flex justify-start">
                         <p>
                           + {item?.name} ({item?.quantity} sinh viên): hệ số{" "}

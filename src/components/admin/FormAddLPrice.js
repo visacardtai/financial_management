@@ -8,12 +8,18 @@ import * as apis from "../../apis";
 import numeral from "numeral";
 import { useDispatch, useSelector } from "react-redux";
 import * as actions from "../../store/actions";
+import useAxiosPrivate from "../../hooks/useAxiosPrivate";
+import { toast } from "react-toastify";
+import { IoIosPricetags } from "react-icons/io";
+import { BiConversation } from "react-icons/bi";
+import { BiArchiveOut } from "react-icons/bi";
 
-const { MdOutlineDriveFileRenameOutline, BiBookmarkAltPlus, BiCheckDouble } =
+const { MdOutlineDriveFileRenameOutline, BiBookmarkAltPlus, LiaCcAmazonPay } =
   icons;
 
 const FormAddLPrice = () => {
-  const { isBlur } = useSelector((state) => state.app);
+  const axiosPrivate = useAxiosPrivate();
+  const { isBlur, refreshBe } = useSelector((state) => state.app);
   const dispatch = useDispatch();
   const [itemBranch, setItemBranch] = React.useState(1);
   const [study, setStudy] = React.useState(0);
@@ -49,36 +55,20 @@ const FormAddLPrice = () => {
     formatPrice(event.target.value);
   };
 
-  const [branch, setBranch] = useState([]);
-  useEffect(() => {
-    const fetchApi = async () => {
-      try {
-        const response = await apis.apiGetAllBranch();
-        if (response?.status === 200) {
-          setBranch(response?.data);
-        }
-      } catch (error) {
-        console.log(error);
-      }
-    };
-    // eslint-disable-next-line
-    fetchApi();
-  }, []);
-
   const handleCreate = () => {
     const fetchApi = async () => {
       try {
         const price = Number(inputValue.replace(/,/g, ""));
-        const response = await apis.apiAddLecturePrice(
-          name,
-          coefficient,
-          price,
-          description
-        );
+        const data = { name, basic_price: price, coefficient, description };
+        const response = await apis.apiAddLecturePrice(axiosPrivate, data);
         if (response?.status === 200) {
+          toast.success("Thêm dữ liệu thành công");
+          dispatch(actions.refreshBe(!refreshBe));
+          dispatch(actions.checkBlur(!isBlur));
           console.log("success");
         }
       } catch (error) {
+        toast.error("Thêm dữ liệu thất bại");
         console.log(error);
       }
     };
@@ -97,7 +87,7 @@ const FormAddLPrice = () => {
       <div className="h-[80%] flex flex-col items-center gap-4">
         <div className="bg-sky-400 w-full rounded-t-xl">
           <h5 className="font-medium text-[20px] my-[20px]">
-            Thêm Giá Giảng Dạy
+            Tạo Giá Tiết Mới
           </h5>
         </div>
         <div className="flex justify-start items-center w-[50%] gap-2 mt-1">
@@ -113,7 +103,7 @@ const FormAddLPrice = () => {
         </div>
         <div className="flex justify-start items-center w-[50%] gap-2 mt-1">
           <div className="flex w-[30%] gap-2">
-            <MdOutlineDriveFileRenameOutline size={24} />
+            <BiConversation size={24} />
             <p>Mô tả</p>
           </div>
           <input
@@ -124,7 +114,7 @@ const FormAddLPrice = () => {
         </div>
         <div className="flex justify-start items-center w-[50%] gap-2">
           <div className="flex w-[30%] gap-2">
-            <MdOutlineDriveFileRenameOutline size={24} />
+            <BiArchiveOut size={24} />
             <p>Hệ số</p>
           </div>
           <input
@@ -138,7 +128,7 @@ const FormAddLPrice = () => {
         </div>
         <div className="flex justify-start items-center w-[50%] gap-2">
           <div className="flex w-[30%] gap-2">
-            <MdOutlineDriveFileRenameOutline size={24} />
+            <IoIosPricetags size={24} />
             <p>Số tiền</p>
           </div>
           {/* type="text"
@@ -154,17 +144,17 @@ const FormAddLPrice = () => {
         </div>
         <div className="flex justify-start items-center w-[50%] gap-2">
           <div className="flex w-[30%] gap-2">
-            <MdOutlineDriveFileRenameOutline size={24} />
+            <LiaCcAmazonPay size={24} />
             <p>VND</p>
           </div>
           <span className="ml-2 px-1 py-2 w-[200px]">{inputValue}</span>
         </div>
         <div className="flex flex-col mt-2">
           <span>
-            Mức giá được thêm mới vào cần có sự kiểm duyệt của trưởng phòng mới
-            có hiệu lực
+            !!! Dữ liệu mới được thêm vào cần được Trưởng Phòng duyệt mới có
+            hiệu lực !!!
           </span>
-          <span>Mức giá đang trong trạng thái chờ</span>
+          <span>Dữ đang trong trạng thái chờ</span>
         </div>
       </div>
       <div className="h-[20%] flex relative">

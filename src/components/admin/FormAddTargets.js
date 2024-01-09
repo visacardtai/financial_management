@@ -3,11 +3,16 @@ import icons from "../../util/icons";
 import * as apis from "../../apis";
 import { useDispatch, useSelector } from "react-redux";
 import * as actions from "../../store/actions";
+import useAxiosPrivate from "../../hooks/useAxiosPrivate";
+import { toast } from "react-toastify";
+import { BiConversation } from "react-icons/bi";
+import { BiArchiveOut } from "react-icons/bi";
 
 const { MdOutlineDriveFileRenameOutline } = icons;
 
 const FormAddTargets = () => {
-  const { isBlur } = useSelector((state) => state.app);
+  const axiosPrivate = useAxiosPrivate();
+  const { isBlur, refreshBe } = useSelector((state) => state.app);
   const dispatch = useDispatch();
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
@@ -24,11 +29,16 @@ const FormAddTargets = () => {
   const handleCreate = () => {
     const fetchApi = async () => {
       try {
-        const response = await apis.apiAddTargets(name, quantity, description);
+        const data = { name, quantity, description };
+        const response = await apis.apiAddTargets(axiosPrivate, data);
         if (response?.status === 200) {
+          toast.success("Thêm dữ liệu thành công");
+          dispatch(actions.refreshBe(!refreshBe));
+          dispatch(actions.checkBlur(!isBlur));
           console.log("success");
         }
       } catch (error) {
+        toast.error("Thêm dữ liệu thất bại");
         console.log(error);
       }
     };
@@ -42,7 +52,9 @@ const FormAddTargets = () => {
     <div className="w-full h-full font-roboto ">
       <div className="h-[80%] flex flex-col items-center gap-4">
         <div className="bg-sky-400 w-full rounded-t-xl">
-          <h5 className="font-medium text-[20px] my-[20px]">Thêm Chỉ Tiêu</h5>
+          <h5 className="font-medium text-[20px] my-[20px]">
+            Tạo Chỉ Tiêu Cho Giảng Viên
+          </h5>
         </div>
         <div className="flex justify-start items-center w-[50%] gap-2 mt-1">
           <div className="flex w-[30%] gap-2">
@@ -57,7 +69,7 @@ const FormAddTargets = () => {
         </div>
         <div className="flex justify-start items-center w-[50%] gap-2 mt-1">
           <div className="flex w-[30%] gap-2">
-            <MdOutlineDriveFileRenameOutline size={24} />
+            <BiConversation size={24} />
             <p>Mô tả</p>
           </div>
           <input
@@ -68,7 +80,7 @@ const FormAddTargets = () => {
         </div>
         <div className="flex justify-start items-center w-[50%] gap-2">
           <div className="flex w-[30%] gap-2">
-            <MdOutlineDriveFileRenameOutline size={24} />
+            <BiArchiveOut size={24} />
             <p>Số tiết</p>
           </div>
           <input
@@ -80,10 +92,10 @@ const FormAddTargets = () => {
         </div>
         <div className="flex flex-col mt-10">
           <span>
-            Chỉ tiêu được thêm mới vào cần có sự kiểm duyệt của trưởng phòng mới
-            có hiệu lực
+            !!! Dữ liệu mới được thêm vào cần được Trưởng Phòng duyệt mới có
+            hiệu lực !!!
           </span>
-          <span>Chỉ tiêu đang trong trạng thái chờ</span>
+          <span>Dữ đang trong trạng thái chờ</span>
         </div>
       </div>
       <div className="h-[20%] flex relative">

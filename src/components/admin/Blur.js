@@ -13,8 +13,10 @@ import {
   FormEditInvoice,
   FormEditTeachingPeriod,
 } from "./index";
+import { useSelector } from "react-redux";
 
 const Blur = ({ actions, type, data, option }) => {
+  const { typeUpload } = useSelector((state) => state.app);
   const confirmType = "bg-white flex w-[30%] h-[35%] rounded-xl relative";
   const addpriceType = "bg-white flex w-[50%] h-[70%] rounded-xl relative";
   const bigType = "bg-white flex w-[60%] h-[80%] rounded-xl relative";
@@ -44,7 +46,7 @@ const Blur = ({ actions, type, data, option }) => {
           ) : type === 35 ? (
             <FormAddTeachingPeriod actions={actions} />
           ) : type === 6 ? (
-            <UploadInvoice actions={actions} />
+            <UploadInvoice typeUpload={typeUpload} />
           ) : type === 7 ? (
             <FormAddStudentExpenses actions={actions} />
           ) : type === 14 ? (

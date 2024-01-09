@@ -19,7 +19,10 @@ import { useEffect, useState } from "react";
 import * as apis from "../../apis";
 import * as helpFn from "../../util/HelpFn";
 import * as actions from "../../store/actions";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import useAxiosPrivate from "../../hooks/useAxiosPrivate";
+import icons from "../../util/icons";
+const { GoSearch } = icons;
 
 function createData(id, name, calories, fat, carbs, protein) {
   return {
@@ -229,6 +232,8 @@ EnhancedTableToolbar.propTypes = {
 };
 
 const TableInvoiceN = () => {
+  const { role, refreshBe } = useSelector((state) => state.app);
+  const axiosPrivate = useAxiosPrivate();
   const dispatch = useDispatch();
   const [order, setOrder] = React.useState("asc");
   const [orderBy, setOrderBy] = React.useState("calories");
@@ -237,21 +242,29 @@ const TableInvoiceN = () => {
   const [rowsPerPage, setRowsPerPage] = React.useState(5);
   const [expPrice, setExpPrice] = useState([]);
   const [itemSelect, setItemSelect] = useState();
+  const [dataSearch, setDataSearch] = useState([]);
+  const [inputValue, setInputValue] = useState("");
 
   useEffect(() => {
     const fetchApi = async () => {
       try {
-        const response = await apis.apiGetAllInvoice(0, 1);
+        const response = await apis.apiGetAllInvoice(axiosPrivate, 0, 1);
         if (response?.status === 200) {
           console.log(response);
           setExpPrice(response?.data);
+
+          const filteredStudents = response?.data?.filter((item) =>
+            item?.name.toLowerCase().includes(inputValue.toLowerCase())
+          );
+          setDataSearch(filteredStudents);
         }
       } catch (error) {
         console.log(error);
       }
     };
     fetchApi();
-  }, []);
+    setSelected([]);
+  }, [refreshBe]);
 
   const handleRequestSort = (event, property) => {
     const isAsc = orderBy === property && order === "asc";
@@ -271,7 +284,7 @@ const TableInvoiceN = () => {
   const handleClick = (event, id) => {
     const selectedIndex = selected !== id;
     if (selectedIndex) {
-      const data = expPrice.find((item) => item.id === id);
+      const data = dataSearch.find((item) => item.id === id);
       setItemSelect(data);
       setSelected(id);
     } else {
@@ -296,11 +309,11 @@ const TableInvoiceN = () => {
 
   const visibleRows = React.useMemo(
     () =>
-      stableSort(expPrice, getComparator(order, orderBy)).slice(
+      stableSort(dataSearch, getComparator(order, orderBy)).slice(
         page * rowsPerPage,
         page * rowsPerPage + rowsPerPage
       ),
-    [order, orderBy, page, rowsPerPage, expPrice]
+    [order, orderBy, page, rowsPerPage, dataSearch]
   );
 
   const handleEdit = () => {
@@ -311,17 +324,60 @@ const TableInvoiceN = () => {
     }
   };
 
+  const handleChangeInput = (event) => {
+    setInputValue(event.target.value);
+  };
+  const handlePrint = () => {
+    const filteredStudents = expPrice.filter((item) =>
+      item?.student_name.toLowerCase().includes(inputValue.toLowerCase())
+    );
+    setDataSearch(filteredStudents);
+  };
+
+  useEffect(() => {
+    handlePrint();
+  }, [inputValue]);
+
   return (
     <div className="w-full flex flex-col items-center relative font-roboto">
-      <div className="absolute right-[5%] top-[-55px] flex gap-3">
-        <button
-          className="bg-[#FF4500] hover:bg-[#ff7644] w-[80px] h-[30px] rounded-xl text-white"
-          onClick={handleEdit}
-        >
-          Chỉnh sửa
-        </button>
-        {/* <button className="">Edit</button> */}
-      </div>
+      {role?.find((item) => item === "ROLE_QUANLY") ? (
+        <div className="absolute right-[5%] top-[-55px] flex gap-3 items-center justify-center">
+          <div className="flex gap-2 justify-center items-center">
+            <div className="bg-[#f8fbfd] flex items-center justify-center border px-2 gap-2 rounded-full">
+              <GoSearch size={24} />
+              <input
+                className="py-2 bg-[#f8fbfd] focus:outline-none"
+                type="text"
+                placeholder="Nhập mã sinh viên"
+                value={inputValue}
+                onChange={handleChangeInput}
+              />
+            </div>
+          </div>
+          <button
+            className="bg-[#FF4500] hover:bg-[#ff7644] w-[80px] h-[30px] rounded-xl text-white"
+            onClick={handleEdit}
+          >
+            Chỉnh sửa
+          </button>
+        </div>
+      ) : (
+        <div className="absolute right-[5%] top-[-55px] flex gap-3 items-center justify-center">
+          <div className="flex gap-2 justify-center items-center">
+            <div className="bg-[#f8fbfd] flex items-center justify-center border px-2 gap-2 rounded-full">
+              <GoSearch size={24} />
+              <input
+                className="py-2 bg-[#f8fbfd] focus:outline-none"
+                type="text"
+                placeholder="Nhập mã sinh viên"
+                value={inputValue}
+                onChange={handleChangeInput}
+              />
+            </div>
+          </div>
+        </div>
+      )}
+
       <div className="w-[90%]">
         <Box sx={{ width: "100%" }}>
           <Paper sx={{ width: "100%", mb: 2 }}>
@@ -337,7 +393,7 @@ const TableInvoiceN = () => {
                   orderBy={orderBy}
                   onSelectAllClick={handleSelectAllClick}
                   onRequestSort={handleRequestSort}
-                  rowCount={expPrice.length}
+                  rowCount={dataSearch.length}
                 />
                 <TableBody>
                   {visibleRows?.map((row, index) => {
@@ -394,7 +450,7 @@ const TableInvoiceN = () => {
             <TablePagination
               rowsPerPageOptions={[5, 10, 15]}
               component="div"
-              count={expPrice.length}
+              count={dataSearch.length}
               rowsPerPage={rowsPerPage}
               page={page}
               onPageChange={handleChangePage}

@@ -13,13 +13,28 @@ import { TbReportAnalytics } from "react-icons/tb";
 import { RiBuilding3Line } from "react-icons/ri";
 import { useMediaQuery } from "react-responsive";
 import { MdMenu } from "react-icons/md";
-import { NavLink, useLocation, useRoutes } from "react-router-dom";
+import { NavLink, useLocation, useNavigate, useRoutes } from "react-router-dom";
+import { MdLogout } from "react-icons/md";
+import { useDispatch } from "react-redux";
+import * as actions from "../../store/actions";
+import useAuth from "../../context/useAuth";
 
 const SidebarAd = () => {
+  const dispatch = useDispatch();
+  const { setAuth } = useAuth();
   let isTabletMid = useMediaQuery({ query: "(max-width: 768px)" });
   const [open, setOpen] = useState(isTabletMid ? false : true);
   const sidebarRef = useRef();
   const { pathname } = useLocation();
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    setAuth();
+    dispatch(actions.setRole());
+    dispatch(actions.setIdUser());
+    dispatch(actions.setInfoUser());
+    navigate("/", { replace: true });
+  };
 
   useEffect(() => {
     if (isTabletMid) {
@@ -72,8 +87,7 @@ const SidebarAd = () => {
       path: "giang-vien",
       icon: RiBuilding3Line,
       menus: [
-        { name: "Danh Sách", path: "danh-sach" },
-        { name: "Giờ Giảng", path: "gio-giang" },
+        { name: "Chỉ Tiêu", path: "chi-tieu" },
         { name: "Bảng Giá", path: "bang-gia" },
         { name: "Kỳ Giảng Dạy", path: "ky-giang-day" },
       ],
@@ -83,11 +97,19 @@ const SidebarAd = () => {
       path: "sinh-vien",
       icon: TbReportAnalytics,
       menus: [
-        { name: "Danh Sách", path: "danh-sach" },
         { name: "Hóa đơn", path: "hoa-don" },
         { name: "Giá Tín Chỉ", path: "gia-tin-chi" },
         { name: "Chi Sinh Viên", path: "chi-sinh-vien" },
         { name: "HĐ-Chi Sinh Viên", path: "hoa-don-chi-sinh-vien" },
+      ],
+    },
+    {
+      name: "thống kê",
+      path: "thong-ke",
+      icon: RiBuilding3Line,
+      menus: [
+        { name: "Hóa đơn", path: "hoa-don" },
+        { name: "Kỳ dạy", path: "ky-day" },
       ],
     },
   ];
@@ -111,7 +133,7 @@ const SidebarAd = () => {
       >
         <div className="flex items-center gap-2.5 font-medium border-b py-3 border-slate-300  mx-3">
           <img
-            // src="https://img.icons8.com/color/512/firebase.png"
+            src="https://firebasestorage.googleapis.com/v0/b/music-ed1de.appspot.com/o/logo2.png?alt=media&token=5fc922ec-b720-4bcc-bd43-ec5f0fb41013"
             width={45}
             alt=""
           />
@@ -160,13 +182,15 @@ const SidebarAd = () => {
           </ul>
           {open && (
             <div className="flex-1 text-sm z-50  max-h-48 my-auto  whitespace-pre   w-full  font-medium  ">
-              <div className="flex border-y border-slate-300 p-4 items-center justify-between">
+              <div
+                className="flex border-y border-slate-300 p-4 items-center justify-center cursor-pointer hover:opacity-70"
+                onClick={handleLogout}
+              >
                 <div>
-                  <p>Spark</p>
-                  <small>No-cost $0/month</small>
+                  <MdLogout size={24} />
                 </div>
-                <p className="text-teal-500 py-1.5 px-3 text-xs bg-teal-50 rounded-xl">
-                  Upgrade
+                <p className="text-teal-500 py-2 px-3 text-xs bg-teal-50 rounded-xl">
+                  Đăng xuất
                 </p>
               </div>
             </div>

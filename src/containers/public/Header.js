@@ -13,10 +13,18 @@ import Settings from "@mui/icons-material/Settings";
 import Logout from "@mui/icons-material/Logout";
 
 import icons from "../../util/icons";
+import { useDispatch, useSelector } from "react-redux";
+import * as actions from "../../store/actions";
+import useAuth from "../../context/useAuth";
+import { useNavigate } from "react-router-dom";
 
 const { BiSolidHome, BiBell, BsCaretDownFill } = icons;
 
 const Header = () => {
+  const { idUser, infoUser } = useSelector((state) => state.app);
+  const { setAuth } = useAuth();
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
   const [anchorEl, setAnchorEl] = useState(null);
   const open = Boolean(anchorEl);
   const handleClick = (event) => {
@@ -25,14 +33,22 @@ const Header = () => {
   const handleClose = () => {
     setAnchorEl(null);
   };
+
+  const handleLogout = () => {
+    setAuth();
+    dispatch(actions.setRole());
+    dispatch(actions.setIdUser());
+    dispatch(actions.setInfoUser());
+    navigate("/", { replace: true });
+  };
   return (
     <div className="fixed z-[999] top-0 left-0 right-0 w-full h-[60px] bg-white flex font-roboto border-b border-[#CDD1D5] shadow-md">
       <div className="w-1/2 h-full">
         <div className="h-full ml-[20%] flex items-center ">
           <img
-            src="https://firebasestorage.googleapis.com/v0/b/music-ed1de.appspot.com/o/ptit.jpg?alt=media&token=898e4dcb-23ef-4eb7-9fb1-5a40a0277384"
+            src="https://firebasestorage.googleapis.com/v0/b/music-ed1de.appspot.com/o/logo2.png?alt=media&token=5fc922ec-b720-4bcc-bd43-ec5f0fb41013"
             alt="logo"
-            className="w-[100px] h-[40px]"
+            className="w-[60px] h-[40px]"
           />
           <p className="ml-3">Học viện Công nghệ Bưu chính</p>
         </div>
@@ -56,11 +72,11 @@ const Header = () => {
             onClick={handleClick}
           >
             <img
-              className="w-[30px] h-[30px] mr-[4px] rounded-full"
-              src="https://firebasestorage.googleapis.com/v0/b/music-ed1de.appspot.com/o/cho.jpg?alt=media&token=1f9ec7a2-a999-4e5f-8dfa-f1bbe9ca7652"
+              className="w-[30px] h-[30px] mr-[4px] rounded-full "
+              src={infoUser?.avatar}
               alt="avatar"
             />
-            <p className="mr-[2px]">Nguyễn Tiến Tài</p>
+            <p className="mr-[2px]">{infoUser?.fullname}</p>
             <div>
               <BsCaretDownFill size="10px" />
             </div>
@@ -110,7 +126,7 @@ const Header = () => {
               </ListItemIcon>
               Đổi mật khẩu
             </MenuItem>
-            <MenuItem onClick={handleClose}>
+            <MenuItem onClick={handleLogout}>
               <ListItemIcon>
                 <Logout fontSize="small" />
               </ListItemIcon>

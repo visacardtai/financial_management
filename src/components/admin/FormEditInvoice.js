@@ -14,13 +14,20 @@ import { CiCirclePlus } from "react-icons/ci";
 import { GoTrash } from "react-icons/go";
 import * as helpFn from "../../util/HelpFn";
 import { useSelector } from "react-redux";
+import useAxiosPrivate from "../../hooks/useAxiosPrivate";
+import { toast } from "react-toastify";
+import { BsCalendarDateFill } from "react-icons/bs";
+import { BiBarChartAlt2 } from "react-icons/bi";
+import { BiFontColor } from "react-icons/bi";
+import { IoIosPricetags } from "react-icons/io";
 
 const { MdOutlineDriveFileRenameOutline, BiBookmarkAltPlus, BiCheckDouble } =
   icons;
 
 const FormEditInvoice = () => {
+  const axiosPrivate = useAxiosPrivate();
   const dispatch = useDispatch();
-  const { editInvoice } = useSelector((state) => state.app);
+  const { editInvoice, refreshBe, isBlur } = useSelector((state) => state.app);
   const [itemSubject, setItemSubject] = React.useState();
   const [itemCreditPrice, setItemCreditPrice] = React.useState();
   const [itemStudent, setItemStudent] = React.useState(editInvoice?.student_id);
@@ -79,7 +86,7 @@ const FormEditInvoice = () => {
   useEffect(() => {
     const fetchApi = async () => {
       try {
-        const response = await apis.apiGetAllStudent();
+        const response = await apis.apiGetAllStudent(axiosPrivate);
         if (response?.status === 200) {
           setStudent(response?.data);
         }
@@ -95,7 +102,7 @@ const FormEditInvoice = () => {
   useEffect(() => {
     const fetchApi = async () => {
       try {
-        const response = await apis.apiGetAllSemester();
+        const response = await apis.apiGetAllSemester(axiosPrivate);
         if (response?.status === 200) {
           setSemester(response?.data);
         }
@@ -111,7 +118,7 @@ const FormEditInvoice = () => {
   useEffect(() => {
     const fetchApi = async () => {
       try {
-        const response = await apis.apiGetExpPriceByStatus(1);
+        const response = await apis.apiGetExpPriceByStatus(axiosPrivate, 1);
         if (response?.status === 200) {
           setExpensesPrice(response?.data);
         }
@@ -127,7 +134,7 @@ const FormEditInvoice = () => {
   useEffect(() => {
     const fetchApi = async () => {
       try {
-        const response = await apis.apiGetCreditPriceByStatus(1);
+        const response = await apis.apiGetCreditPriceByStatus(axiosPrivate, 1);
         if (response?.status === 200) {
           setCreditPrice(response?.data);
         }
@@ -143,7 +150,7 @@ const FormEditInvoice = () => {
   useEffect(() => {
     const fetchApi = async () => {
       try {
-        const response = await apis.apiGetAllSubjcet();
+        const response = await apis.apiGetAllSubjcet(axiosPrivate);
         if (response?.status === 200) {
           setSubject(response?.data);
         }
@@ -166,19 +173,24 @@ const FormEditInvoice = () => {
     }));
     const fetchApi = async () => {
       try {
-        const response = await apis.apiEditInvoice(
-          editInvoice?.id,
+        const dataEdit = {
+          id: editInvoice?.id,
           name,
-          itemStudent,
-          itemSemester,
-          expiration,
+          student_id: itemStudent,
+          semester_id: itemSemester,
+          expiration_date: expiration,
           listDelete,
-          data
-        );
+          details: data,
+        };
+        const response = await apis.apiEditInvoice(axiosPrivate, dataEdit);
         if (response?.status === 200) {
+          toast.success("Sửa dữ liệu thành công");
+          dispatch(actions.refreshBe(!refreshBe));
+          dispatch(actions.checkBlur(!isBlur));
           console.log("success");
         }
       } catch (error) {
+        toast.error("Sửa dữ liệu thất bại");
         console.log(error);
       }
     };
@@ -197,12 +209,12 @@ const FormEditInvoice = () => {
   };
 
   const handleAddDetails = () => {
-    if (itemSubject && itemCreditPrice) {
+    if (itemSubject) {
       const sub = subject.find((item) => item?.id === itemSubject);
-      const price = creditPrice.find((item) => item?.id === itemCreditPrice);
+      // const price = creditPrice.find((item) => item?.id === itemCreditPrice);
       const check = details.find((item) => item?.sub?.id === sub?.id);
       if (!check) {
-        setDetails((prev) => [...prev, { sub, price, id: -1 }]);
+        setDetails((prev) => [...prev, { sub, price: 0, id: -1 }]);
       }
     }
   };
@@ -217,7 +229,7 @@ const FormEditInvoice = () => {
     <div className="w-full h-full font-roboto ">
       <div className="bg-sky-400 w-full rounded-t-xl">
         <h5 className="font-medium text-[20px] py-3">
-          Thêm Hóa Đơn Chi Sinh Viên
+          Chỉnh Sửa Hóa Đơn Học Phí
         </h5>
       </div>
       <div className="flex mt-6 h-[70%]">
@@ -236,20 +248,20 @@ const FormEditInvoice = () => {
           </div>
           <div className="flex justify-start items-center w-[80%] gap-2 mt-1">
             <div className="flex w-[30%] gap-2">
-              <MdOutlineDriveFileRenameOutline size={24} />
-              <p>Tên HĐ</p>
+              <BsCalendarDateFill size={24} />
+              <p>Ngày hết</p>
             </div>
             <input
               type="date"
               defaultValue={expiration}
-              placeholder="Tên hóa đơn"
+              placeholder="Ngày hết"
               className="ml-2 px-1 py-2 w-[220px] border rounded-md"
               onChange={(event) => setExpiration(event.target.value)}
             />
           </div>
           <div className="flex justify-start items-center w-[80%] gap-2">
             <div className="flex w-[30%] gap-2">
-              <BiBookmarkAltPlus size={24} />
+              <BiBarChartAlt2 size={24} />
               <p>Kỳ</p>
             </div>
             <FormControl sx={{ m: 1, minWidth: 220 }} size="small">
@@ -272,7 +284,7 @@ const FormEditInvoice = () => {
           </div>
           <div className="flex justify-start items-center w-[80%] gap-2">
             <div className="flex w-[30%] gap-2">
-              <BiBookmarkAltPlus size={24} />
+              <BiFontColor size={24} />
               <p>Mã SV</p>
             </div>
             <FormControl sx={{ m: 1, minWidth: 220 }} size="small">
@@ -330,9 +342,9 @@ const FormEditInvoice = () => {
               </Select>
             </FormControl>
           </div>
-          <div className="flex justify-start items-center w-[90%] gap-2">
+          {/* <div className="flex justify-start items-center w-[90%] gap-2">
             <div className="flex w-[30%] gap-2">
-              <BiBookmarkAltPlus size={24} />
+              <IoIosPricetags size={24} />
               <p>Giá</p>
             </div>
             <FormControl sx={{ m: 1, minWidth: 220 }} size="small">
@@ -352,15 +364,13 @@ const FormEditInvoice = () => {
                   ))}
               </Select>
             </FormControl>
-          </div>
+          </div> */}
           <div className="w-[80%] flex flex-col gap-1">
             <p className="border-b-2 py-1 text-[16px] font-medium">Details</p>
             {details?.length !== 0 &&
               details?.map((item, index) => (
                 <div className="flex justify-start" key={index}>
-                  <p>{`${index + 1} - ${item?.sub?.name} - ${helpFn.converVND(
-                    item?.price?.price
-                  )}`}</p>
+                  <p>{`${index + 1} - ${item?.sub?.name}`}</p>
                 </div>
               ))}
           </div>

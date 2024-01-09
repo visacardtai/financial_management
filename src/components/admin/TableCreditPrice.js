@@ -18,6 +18,8 @@ import { useEffect, useState } from "react";
 
 import * as apis from "../../apis";
 import * as helpFn from "../../util/HelpFn";
+import useAxiosPrivate from "../../hooks/useAxiosPrivate";
+import pathApis from "../../apis/PathApi";
 
 function createData(id, name, calories, fat, carbs, protein) {
   return {
@@ -215,6 +217,7 @@ EnhancedTableToolbar.propTypes = {
 };
 
 const TableCreditPrice = () => {
+  const axiosPrivate = useAxiosPrivate();
   const [order, setOrder] = React.useState("asc");
   const [orderBy, setOrderBy] = React.useState("calories");
   const [selected, setSelected] = React.useState([]);
@@ -223,9 +226,10 @@ const TableCreditPrice = () => {
   const [creditPrice, setCreditPrice] = useState([]);
 
   useEffect(() => {
+    const controller = new AbortController();
     const fetchApi = async () => {
       try {
-        const response = await apis.apiGetCreditPriceByStatus(1);
+        const response = await apis.apiGetCreditPriceByStatus(axiosPrivate, 1);
         if (response?.status === 200) {
           console.log(response);
           setCreditPrice(response?.data);

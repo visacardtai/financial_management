@@ -9,6 +9,7 @@ import Paper from "@mui/material/Paper";
 import { TableVirtuoso } from "react-virtuoso";
 import * as apis from "../../apis";
 import * as helpFn from "../../util/HelpFn";
+import useAxiosPrivate from "../../hooks/useAxiosPrivate";
 
 const columns = [
   {
@@ -95,11 +96,12 @@ function rowContent(_index, row) {
 }
 
 const AllPrice = () => {
+  const axiosPrivate = useAxiosPrivate();
   const [allPrice, setAllPrice] = useState(null);
   useEffect(() => {
     const fetchApi = async () => {
       try {
-        const response = await apis.apiGetAllLecturePrice();
+        const response = await apis.apiGetAllLecturePrice(axiosPrivate);
         if (response?.status === 200) {
           setAllPrice(response?.data);
           console.log(response?.data);

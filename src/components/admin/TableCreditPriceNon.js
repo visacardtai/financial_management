@@ -20,6 +20,8 @@ import * as apis from "../../apis";
 import * as helpFn from "../../util/HelpFn";
 import { useDispatch, useSelector } from "react-redux";
 import * as actions from "../../store/actions";
+import useAxiosPrivate from "../../hooks/useAxiosPrivate";
+import pathApis from "../../apis/PathApi";
 
 function createData(id, name, calories, fat, carbs, protein) {
   return {
@@ -217,6 +219,8 @@ EnhancedTableToolbar.propTypes = {
 };
 
 const TableCreditPriceNon = () => {
+  const { role, refreshBe } = useSelector((state) => state.app);
+  const axiosPrivate = useAxiosPrivate();
   const { isBlur } = useSelector((state) => state.app);
   const dispatch = useDispatch();
   const [order, setOrder] = React.useState("asc");
@@ -229,7 +233,7 @@ const TableCreditPriceNon = () => {
   useEffect(() => {
     const fetchApi = async () => {
       try {
-        const response = await apis.apiGetCreditPriceByStatus(0);
+        const response = await apis.apiGetCreditPriceByStatus(axiosPrivate, 0);
         if (response?.status === 200) {
           console.log(response);
           setCreditPrice(response?.data);
@@ -239,7 +243,8 @@ const TableCreditPriceNon = () => {
       }
     };
     fetchApi();
-  }, []);
+    setSelected([]);
+  }, [refreshBe]);
 
   const handleRequestSort = (event, property) => {
     const isAsc = orderBy === property && order === "asc";
@@ -315,24 +320,47 @@ const TableCreditPriceNon = () => {
     dispatch(actions.checkBlur(!isBlur));
   };
 
+  const handleCensor = () => {
+    if (selected.length !== 0) {
+      dispatch(actions.changeTypeBlur(1));
+      dispatch(actions.changeTypeDelete(8));
+      dispatch(actions.checkBlur(!isBlur));
+      dispatch(actions.listDelete(selected));
+    } else {
+      console.log("Non");
+    }
+  };
+
   return (
     <div className="w-full flex flex-col items-center relative font-roboto">
       <div className="w-[90%] flex flex-col gap-4">
-        <div className="absolute right-[5%] top-[-55px] flex gap-3">
-          <button
-            onClick={handleAdd}
-            className="bg-[#61f461] hover:bg-[#56fb56] w-[80px] h-[30px] rounded-xl text-white"
-          >
-            Thêm
-          </button>
-          <button
-            onClick={handlDelete}
-            className="bg-[#FF4500] hover:bg-[#ff7644] w-[80px] h-[30px] rounded-xl text-white"
-          >
-            Xóa
-          </button>
-          {/* <button className="">Edit</button> */}
-        </div>
+        {role?.find((item) => item === "ROLE_QUANLY") ? (
+          <div className="absolute right-[5%] top-[-55px] flex gap-3">
+            <button
+              onClick={handleAdd}
+              className="bg-[#61f461] hover:bg-[#56fb56] w-[80px] h-[30px] rounded-xl text-white"
+            >
+              Thêm
+            </button>
+            <button
+              onClick={handlDelete}
+              className="bg-[#FF4500] hover:bg-[#ff7644] w-[80px] h-[30px] rounded-xl text-white"
+            >
+              Xóa
+            </button>
+            {/* <button className="">Edit</button> */}
+          </div>
+        ) : (
+          <div className="absolute right-[5%] top-[-55px] flex gap-3">
+            <button
+              onClick={handleCensor}
+              className="bg-[#61f461] hover:bg-[#56fb56] w-[80px] h-[30px] rounded-xl text-white"
+            >
+              Duyệt
+            </button>
+          </div>
+        )}
+
         <Box sx={{ width: "100%" }}>
           <Paper sx={{ width: "100%", mb: 2 }}>
             <TableContainer>

@@ -2,6 +2,8 @@ import React, { useState, useEffect } from "react";
 import { BarChart } from "@mui/x-charts/BarChart";
 import { axisClasses } from "@mui/x-charts";
 import * as apis from "../../apis";
+import useAxiosPrivate from "../../hooks/useAxiosPrivate";
+import { useSelector } from "react-redux";
 
 const chartSetting = {
   yAxis: [
@@ -107,14 +109,18 @@ const dataset = [
 const valueFormatter = (value) => `${value} tiết`;
 
 const ChartSubject = () => {
+  const { idUser } = useSelector((state) => state.app);
+  const axiosPrivate = useAxiosPrivate();
   const [dataChart, setDataChart] = useState(null);
   useEffect(() => {
     const fetchDataChart = async () => {
       try {
-        const response = await apis.apiGetDataChartLecture(1);
+        const response = await apis.apiGetDataChartLecture(
+          axiosPrivate,
+          idUser
+        );
         if (response?.status === 200) {
           setDataChart(response?.data);
-          console.log(response?.data);
         }
       } catch (error) {
         console.log(error);

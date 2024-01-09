@@ -1,5 +1,7 @@
 import "./App.css";
 import { Route, Routes } from "react-router-dom";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 import {
   Public,
@@ -17,6 +19,7 @@ import {
   HomeLec,
   PubLecturer,
   TeachingHours,
+  Attendance,
 } from "./containers/public/lecturer";
 import {
   PublicAd,
@@ -28,6 +31,8 @@ import {
   Invoice,
   TeachingPeriod,
   StudentExpenses,
+  ChartInvoice,
+  ChartTeachingPeriod,
 } from "./containers/system";
 import Missing from "./context/Missing";
 import RequireAuth from "./context/RequireAuth";
@@ -71,6 +76,7 @@ function App() {
               <Route path={path?.LECTURER} element={<PubLecturer />}>
                 <Route path={path?.HOME} element={<HomeLec />} />
                 <Route path={path?.TEACHINGHOURS} element={<TeachingHours />} />
+                <Route path={path?.ATTENDANCE} element={<Attendance />} />
               </Route>
             </Route>
 
@@ -94,6 +100,11 @@ function App() {
                   path={path?.STUDENTEXPENSES}
                   element={<StudentExpenses />}
                 />
+                <Route path={path?.CHARTINVOICE} element={<ChartInvoice />} />
+                <Route
+                  path={path?.CHARTTEACHINGPERIOD}
+                  element={<ChartTeachingPeriod />}
+                />
               </Route>
             </Route>
             {/* catch all */}
@@ -101,6 +112,18 @@ function App() {
           </Route>
         </Routes>
       </div>
+      <ToastContainer
+        position="top-right"
+        autoClose={5000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="light"
+      />
     </>
   );
 }

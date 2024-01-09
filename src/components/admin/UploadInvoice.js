@@ -1,9 +1,14 @@
 import React, { useCallback, useState } from "react";
 import { useDropzone } from "react-dropzone";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import * as actions from "../../store/actions";
+import * as apis from "../../apis";
+import { toast } from "react-toastify";
+import useAxiosPrivateUpload from "../../hooks/useAxiosPrivateUpload";
 
 const UploadInvoice = () => {
+  const { isBlur, refreshBe, typeUpload } = useSelector((state) => state.app);
+  const axiosPrivateUpload = useAxiosPrivateUpload();
   const dispatch = useDispatch();
   const [uploadedFile, setUploadedFile] = useState(null);
   const [checkFile, setCheckFile] = useState(true);
@@ -36,12 +41,41 @@ const UploadInvoice = () => {
     dispatch(actions.checkBlur(false));
   };
 
+  const handleCreate = () => {
+    const fetchApi = async () => {
+      try {
+        const response = await apis.apiAddTPExcel(
+          axiosPrivateUpload,
+          uploadedFile,
+          typeUpload
+        );
+        if (response?.status === 200) {
+          toast.success("Thêm dữ liệu thành công");
+          dispatch(actions.refreshBe(!refreshBe));
+          dispatch(actions.checkBlur(!isBlur));
+          console.log("success");
+        }
+      } catch (error) {
+        toast.error("Thêm dữ liệu thất bại");
+        console.log(error);
+      }
+    };
+    if (uploadedFile !== null) {
+      console.log(uploadedFile);
+      fetchApi();
+    }
+  };
+
   return (
     <div className="w-full h-full font-roboto ">
       <div className="h-[80%] flex flex-col items-center gap-4">
         <div className="bg-sky-400 w-full rounded-t-xl">
           <h5 className="font-medium text-[18px] my-[16px]">
-            Upload File Hóa Đơn
+            {typeUpload === 1
+              ? "Up File Danh Sách Hóa Đơn Học Phí"
+              : typeUpload === 2
+              ? "Up File Danh Sách Hóa Đơn Chi Sinh Viên"
+              : "Up File Danh Sách Kỳ Dạy"}
           </h5>
         </div>
         <div className="w-[150px] h-[150px] bg-sky-400 text-white flex flex-col items-center justify-center rounded-xl cursor-pointer">
@@ -49,7 +83,7 @@ const UploadInvoice = () => {
             {...getRootProps()}
             className={`dropzone ${isDragActive ? "active" : ""}`}
           >
-            <input {...getInputProps()} />
+            <input type="file" {...getInputProps()} />
             {isDragActive ? (
               <p>Kéo và thả file Excel vào đây hoặc nhấp để chọn file</p>
             ) : (
@@ -80,7 +114,7 @@ const UploadInvoice = () => {
             Hủy
           </button>
           <button
-            // onClick={handleCreate}
+            onClick={handleCreate}
             className="bg-[#00FF00] hover:bg-[#56fb56] w-[80px] h-[30px] rounded-xl"
           >
             Tạo

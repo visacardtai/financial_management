@@ -9,12 +9,13 @@ import {
   TableStudentExpenses,
   TableStudentExpensesN,
   TableStudentExpensesP,
+  TableStudentExpensesNA,
   Blur,
 } from "../../components/admin";
 import { useSelector } from "react-redux";
 
 const StudentExpenses = () => {
-  const { isBlur, typeBlur, typeDelete, listDelete } = useSelector(
+  const { isBlur, typeBlur, typeDelete, listDelete, role } = useSelector(
     (state) => state.app
   );
   return (
@@ -29,7 +30,11 @@ const StudentExpenses = () => {
           <TableStudentExpenses />
         </TabPanel>
         <TabPanel value={2}>
-          <TableStudentExpensesN />
+          {role?.find((item) => item === "ROLE_TRUONGPHONG") ? (
+            <TableStudentExpensesNA />
+          ) : (
+            <TableStudentExpensesN />
+          )}
         </TabPanel>
         <TabPanel value={3}>
           <TableStudentExpensesP />

@@ -14,13 +14,21 @@ import { CiCirclePlus } from "react-icons/ci";
 import { GoTrash } from "react-icons/go";
 import * as helpFn from "../../util/HelpFn";
 import { useSelector } from "react-redux";
+import useAxiosPrivate from "../../hooks/useAxiosPrivate";
+import { toast } from "react-toastify";
+import { BiBarChartAlt2 } from "react-icons/bi";
+import { IoIosPricetags } from "react-icons/io";
+import { BiArchiveOut } from "react-icons/bi";
 
 const { MdOutlineDriveFileRenameOutline, BiBookmarkAltPlus, BiCheckDouble } =
   icons;
 
 const FormEditTeachingPeriod = () => {
+  const axiosPrivate = useAxiosPrivate();
   const dispatch = useDispatch();
-  const { editTeachingPeriod } = useSelector((state) => state.app);
+  const { editTeachingPeriod, refreshBe, isBlur } = useSelector(
+    (state) => state.app
+  );
   const [itemSubject, setItemSubject] = React.useState();
   const [itemClassCoefficient, setItemClassCoefficient] = React.useState();
   const [itemLecture, setItemLecture] = React.useState(
@@ -41,6 +49,8 @@ const FormEditTeachingPeriod = () => {
     id: item?.id,
   }));
   const [details, setDetails] = React.useState(convertData);
+  const [itemDataCoefficient, setItemDataCoefficient] = React.useState();
+  const [name, setName] = useState(null);
 
   const handleChange = (event) => {
     setItemLecture(event.target.value);
@@ -74,7 +84,7 @@ const FormEditTeachingPeriod = () => {
   useEffect(() => {
     const fetchApi = async () => {
       try {
-        const response = await apis.apiGetAllLecturer();
+        const response = await apis.apiGetAllLecturer(axiosPrivate);
         if (response?.status === 200) {
           setLecture(response?.data);
         }
@@ -90,7 +100,7 @@ const FormEditTeachingPeriod = () => {
   useEffect(() => {
     const fetchApi = async () => {
       try {
-        const response = await apis.apiGetAllSemester();
+        const response = await apis.apiGetAllSemester(axiosPrivate);
         if (response?.status === 200) {
           setSemester(response?.data);
         }
@@ -106,7 +116,7 @@ const FormEditTeachingPeriod = () => {
   useEffect(() => {
     const fetchApi = async () => {
       try {
-        const response = await apis.apiGetAllTargets(1);
+        const response = await apis.apiGetAllTargets(axiosPrivate, 1);
         if (response?.status === 200) {
           setTargets(response?.data);
         }
@@ -122,7 +132,7 @@ const FormEditTeachingPeriod = () => {
   useEffect(() => {
     const fetchApi = async () => {
       try {
-        const response = await apis.apiGetAllLecturePrice();
+        const response = await apis.apiGetAllLecturePrice(axiosPrivate);
         if (response?.status === 200) {
           setLecturePrice(response?.data);
         }
@@ -138,7 +148,7 @@ const FormEditTeachingPeriod = () => {
   useEffect(() => {
     const fetchApi = async () => {
       try {
-        const response = await apis.apiGetAllClassCoefficient();
+        const response = await apis.apiGetAllClassCoefficient(axiosPrivate);
         if (response?.status === 200) {
           setClassCoefficient(response?.data);
         }
@@ -154,7 +164,7 @@ const FormEditTeachingPeriod = () => {
   useEffect(() => {
     const fetchApi = async () => {
       try {
-        const response = await apis.apiGetAllSubjcet();
+        const response = await apis.apiGetAllSubjcet(axiosPrivate);
         if (response?.status === 200) {
           setSubject(response?.data);
         }
@@ -177,19 +187,27 @@ const FormEditTeachingPeriod = () => {
     }));
     const fetchApi = async () => {
       try {
-        const response = await apis.apiEditTeachingPeriod(
-          editTeachingPeriod?.id,
-          itemTargets,
-          itemLecture,
-          itemLecturePrice,
-          itemSemester,
+        const dataEdit = {
+          id: editTeachingPeriod?.id,
+          targets_id: itemTargets,
+          lecturer_id: itemLecture,
+          lecture_price_id: itemLecturePrice,
+          semester_id: itemSemester,
           listDelete,
-          data
+          details: data,
+        };
+        const response = await apis.apiEditTeachingPeriod(
+          axiosPrivate,
+          dataEdit
         );
         if (response?.status === 200) {
+          toast.success("Sửa dữ liệu thành công");
+          dispatch(actions.refreshBe(!refreshBe));
+          dispatch(actions.checkBlur(!isBlur));
           console.log("success");
         }
       } catch (error) {
+        toast.error("Sửa dữ liệu thất bại");
         console.log(error);
       }
     };
@@ -222,17 +240,36 @@ const FormEditTeachingPeriod = () => {
     }
   };
 
+  useEffect(() => {
+    if (classCoefficient && name !== null && name > 0) {
+      const item = classCoefficient?.find((i) => {
+        return i?.quantity >= name;
+      });
+      console.log(item);
+      setItemDataCoefficient(item);
+      setItemClassCoefficient(item?.id);
+    }
+    if (name === "") {
+      setItemDataCoefficient();
+      setItemClassCoefficient();
+    }
+    console.log(name);
+    // eslint-disable-next-line
+  }, [name]);
+
   return (
     <div className="w-full h-full font-roboto ">
       <div className="bg-sky-400 w-full rounded-t-xl">
-        <h5 className="font-medium text-[20px] py-3">Chỉnh Sửa Kỳ Giảng Dạy</h5>
+        <h5 className="font-medium text-[20px] py-3">
+          Chỉnh Sửa Kỳ Dạy Giảng Viên
+        </h5>
       </div>
       <div className="flex mt-6 h-[70%]">
         <div className="w-1/2 flex flex-col items-center gap-4 border-r-2">
           <div className="flex justify-start items-center w-[90%] gap-2">
             <div className="flex w-[30%] gap-2">
               <BiBookmarkAltPlus size={24} />
-              <p>GV</p>
+              <p>Tên GV</p>
             </div>
             <FormControl sx={{ m: 1, minWidth: 220 }} size="small">
               <InputLabel id="demo-select-small-label">Giảng viên</InputLabel>
@@ -254,7 +291,7 @@ const FormEditTeachingPeriod = () => {
           </div>
           <div className="flex justify-start items-center w-[90%] gap-2">
             <div className="flex w-[30%] gap-2">
-              <BiBookmarkAltPlus size={24} />
+              <BiBarChartAlt2 size={24} />
               <p>Kỳ</p>
             </div>
             <FormControl sx={{ m: 1, minWidth: 220 }} size="small">
@@ -275,9 +312,9 @@ const FormEditTeachingPeriod = () => {
               </Select>
             </FormControl>
           </div>
-          <div className="flex justify-start items-center w-[90%] gap-2">
+          {/* <div className="flex justify-start items-center w-[90%] gap-2">
             <div className="flex w-[30%] gap-2">
-              <BiBookmarkAltPlus size={24} />
+              <BiArchiveOut size={24} />
               <p>Chỉ tiêu</p>
             </div>
             <FormControl sx={{ m: 1, minWidth: 220 }} size="small">
@@ -300,7 +337,7 @@ const FormEditTeachingPeriod = () => {
           </div>
           <div className="flex justify-start items-center w-[90%] gap-2">
             <div className="flex w-[30%] gap-2">
-              <BiBookmarkAltPlus size={24} />
+              <IoIosPricetags size={24} />
               <p>Loại giá</p>
             </div>
             <FormControl sx={{ m: 1, minWidth: 220 }} size="small">
@@ -322,7 +359,7 @@ const FormEditTeachingPeriod = () => {
                   ))}
               </Select>
             </FormControl>
-          </div>
+          </div> */}
         </div>
         <div className="w-1/2 flex flex-col items-center gap-1">
           <div className="flex gap-2 w-[80%] justify-end">
@@ -360,9 +397,9 @@ const FormEditTeachingPeriod = () => {
               </Select>
             </FormControl>
           </div>
-          <div className="flex justify-start items-center w-[90%] gap-2">
+          {/* <div className="flex justify-start items-center w-[90%] gap-2">
             <div className="flex w-[30%] gap-2">
-              <BiBookmarkAltPlus size={24} />
+              <BiArchiveOut size={24} />
               <p>Hệ số lớp</p>
             </div>
             <FormControl sx={{ m: 1, minWidth: 220 }} size="small">
@@ -382,6 +419,45 @@ const FormEditTeachingPeriod = () => {
                   ))}
               </Select>
             </FormControl>
+          </div> */}
+          <div className="flex justify-start items-center w-[90%] gap-2">
+            <div className="flex w-[30%] gap-2">
+              <BiArchiveOut size={24} />
+              <p>Số sinh viên</p>
+            </div>
+            <input
+              placeholder="Số sinh viên"
+              className="ml-2 px-1 py-2 w-[220px] border rounded-md"
+              type="number"
+              onChange={(event) => setName(event.target.value)}
+            />
+          </div>
+          <div className="flex justify-start items-center w-[90%] gap-2 mt-3">
+            <div className="flex w-[30%] gap-2">
+              <BiArchiveOut size={24} />
+              <p>Hệ số lớp</p>
+            </div>
+            {itemDataCoefficient && (
+              <span>{`${itemDataCoefficient?.id} - ${itemDataCoefficient?.name} - SL${itemDataCoefficient?.quantity} - HS${itemDataCoefficient?.coefficient}`}</span>
+            )}
+            {/* <FormControl sx={{ m: 1, minWidth: 220 }} size="small">
+              <InputLabel id="demo-select-small-label">Hệ số lớp</InputLabel>
+              <Select
+                labelId="demo-select-small-label"
+                id="demo-select-small"
+                value={itemClassCoefficient}
+                label="Hệ số lớp"
+                onChange={handleChangeClassCoefficient}
+                disabled
+              >
+                {classCoefficient?.length !== 0 &&
+                  classCoefficient?.map((item) => (
+                    <MenuItem value={item?.id} key={item?.id}>
+                      {`${item?.id} - ${item?.name} - SL${item?.quantity} - HS${item?.coefficient}`}
+                    </MenuItem>
+                  ))}
+              </Select>
+            </FormControl> */}
           </div>
           <div className="w-[80%] flex flex-col gap-1">
             <p className="border-b-2 py-1 text-[16px] font-medium">Details</p>

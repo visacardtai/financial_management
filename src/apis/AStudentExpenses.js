@@ -1,11 +1,10 @@
+import { json } from "react-router-dom";
 import axios from "../axios";
 
-export const apiGetAllStudentExpenses = (status, state) =>
+export const apiGetAllStudentExpenses = (axiosPrivate, status, state) =>
   new Promise(async (resolve, reject) => {
     try {
-      const response = await axios({
-        url: "/student-expenses/alls",
-        method: "get",
+      const response = await axiosPrivate.get("/expert/student-expenses/alls", {
         params: { status, state },
       });
       resolve(response);
@@ -14,12 +13,57 @@ export const apiGetAllStudentExpenses = (status, state) =>
     }
   });
 
-export const apiGetAllStudent = () =>
+export const apiGetAllStudent = (axiosPrivate) =>
   new Promise(async (resolve, reject) => {
     try {
-      const response = await axios({
-        url: "/student",
-        method: "get",
+      const response = await axiosPrivate.get("/expert/student");
+      resolve(response);
+    } catch (error) {
+      reject(error);
+    }
+  });
+
+export const apiGetAllSemester = (axiosPrivate) =>
+  new Promise(async (resolve, reject) => {
+    try {
+      const response = await axiosPrivate.get("/expert/semester");
+      resolve(response);
+    } catch (error) {
+      reject(error);
+    }
+  });
+
+export const apiCreateStudentExpenses = (axiosPrivate, dataAdd) =>
+  new Promise(async (resolve, reject) => {
+    try {
+      const response = await axiosPrivate.post(
+        "/expert/student-expenses",
+        JSON.stringify(dataAdd)
+      );
+      resolve(response);
+    } catch (error) {
+      reject(error);
+    }
+  });
+
+export const apiEditStudentExpenses = (axiosPrivate, dataEdit) =>
+  new Promise(async (resolve, reject) => {
+    try {
+      const response = await axiosPrivate.put(
+        "/expert/student-expenses",
+        JSON.stringify(dataEdit)
+      );
+      resolve(response);
+    } catch (error) {
+      reject(error);
+    }
+  });
+
+export const apiDeleteStudentExpenses = (axiosPrivate, data) =>
+  new Promise(async (resolve, reject) => {
+    try {
+      const response = await axiosPrivate.delete("/expert/student-expenses", {
+        data,
       });
       resolve(response);
     } catch (error) {
@@ -27,77 +71,42 @@ export const apiGetAllStudent = () =>
     }
   });
 
-export const apiGetAllSemester = () =>
+export const apiCensorExpPrice = (axiosPrivate, data) =>
   new Promise(async (resolve, reject) => {
     try {
-      const response = await axios({
-        url: "/semester",
-        method: "get",
-      });
+      console.log(data);
+      const response = await axiosPrivate.put(
+        "/expert/expenses-price",
+        JSON.stringify(data)
+      );
       resolve(response);
     } catch (error) {
       reject(error);
     }
   });
 
-export const apiCreateStudentExpenses = (
-  name,
-  itemStudent,
-  itemSemester,
-  data
-) =>
+export const apiCensorStudentExp = (axiosPrivate, data) =>
   new Promise(async (resolve, reject) => {
     try {
-      const response = await axios({
-        url: "/student-expenses",
-        method: "post",
-        data: {
-          name,
-          student_id: itemStudent,
-          semester_id: itemSemester,
-          details: data,
-        },
-      });
+      console.log(data);
+      const response = await axiosPrivate.put(
+        "/expert/student-expenses/censor",
+        JSON.stringify(data)
+      );
       resolve(response);
     } catch (error) {
       reject(error);
     }
   });
 
-export const apiEditStudentExpenses = (
-  id,
-  name,
-  itemStudent,
-  itemSemester,
-  different
-) =>
+export const apiPayCensorStudentExp = (axiosPrivate, data) =>
   new Promise(async (resolve, reject) => {
     try {
-      const response = await axios({
-        url: "/student-expenses",
-        method: "put",
-        data: {
-          id,
-          name,
-          student_id: itemStudent,
-          semester_id: itemSemester,
-          details: different,
-        },
-      });
-      resolve(response);
-    } catch (error) {
-      reject(error);
-    }
-  });
-
-export const apiDeleteStudentExpenses = (data) =>
-  new Promise(async (resolve, reject) => {
-    try {
-      const response = await axios({
-        url: "/student-expenses",
-        method: "delete",
-        data: data,
-      });
+      console.log(data);
+      const response = await axiosPrivate.put(
+        "/expert/student-expenses/pay/censor",
+        JSON.stringify(data)
+      );
       resolve(response);
     } catch (error) {
       reject(error);

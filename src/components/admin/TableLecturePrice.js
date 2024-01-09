@@ -18,6 +18,7 @@ import { useEffect, useState } from "react";
 
 import * as apis from "../../apis";
 import * as helpFn from "../../util/HelpFn";
+import useAxiosPrivate from "../../hooks/useAxiosPrivate";
 
 function createData(id, name, calories, fat, carbs, protein) {
   return {
@@ -209,6 +210,7 @@ EnhancedTableToolbar.propTypes = {
 };
 
 const TableLecturePrice = () => {
+  const axiosPrivate = useAxiosPrivate();
   const [order, setOrder] = React.useState("asc");
   const [orderBy, setOrderBy] = React.useState("calories");
   const [selected, setSelected] = React.useState([]);
@@ -219,7 +221,7 @@ const TableLecturePrice = () => {
   useEffect(() => {
     const fetchApi = async () => {
       try {
-        const response = await apis.apiGetLecturePriceByStatus(1);
+        const response = await apis.apiGetLecturePriceByStatus(axiosPrivate, 1);
         if (response?.status === 200) {
           console.log(response);
           setExpPrice(response?.data);

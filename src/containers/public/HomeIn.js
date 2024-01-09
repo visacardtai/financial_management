@@ -28,48 +28,53 @@ import Button from "@mui/material/Button";
 import useAuth from "../../context/useAuth";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import * as apis from "../../apis";
-
+import axios from "../../apis/axios";
 import icons from "../../util/icons";
+import { useDispatch, useSelector } from "react-redux";
+import * as actions from "../../store/actions";
+import { toast } from "react-toastify";
 
 const { BiSolidHome, BiBell, BsCaretDownFill } = icons;
 
 const HomeIn = () => {
+  const { role } = useSelector((state) => state.app);
+  const dispatch = useDispatch();
   const { setAuth } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
-  const [anchorEl, setAnchorEl] = useState(null);
-  const open = Boolean(anchorEl);
-
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-
-  const handleClick = (event) => {
-    setAnchorEl(event.currentTarget);
-  };
-  const handleClose = () => {
-    setAnchorEl(null);
-  };
-
-  const [showPassword, setShowPassword] = useState(false);
-
-  const handleClickShowPassword = () => setShowPassword((show) => !show);
-
-  const handleMouseDownPassword = (event) => {
-    event.preventDefault();
-  };
 
   const handleLogin = () => {
     const fetchApi = async () => {
       try {
-        const response = await apis.apiLogin(username, password);
+        const response = await axios.post(
+          "/auth/authenticate",
+          JSON.stringify({ username, password }),
+          {
+            headers: { "Content-Type": "application/json" },
+            withCredentials: true,
+          }
+        );
         if (response?.status === 200) {
-          const accessToken = response?.data?.token;
+          const accessToken = response?.data?.accessToken;
           const roles = response?.data?.role;
+          dispatch(actions.setRole(roles));
+          dispatch(actions.setIdUser(response?.data?.id));
+          dispatch(actions.setInfoUser(response?.data?.profile));
           setAuth({ username, password, roles, accessToken });
-          const from = location.state?.from?.pathname || "/";
-          navigate(from, { replace: true });
+          if (roles.find((role) => role === "ROLE_SINHVIEN")) {
+            console.log("sinhvien");
+            navigate("/sinh-vien", { replace: true });
+          } else if (roles.find((role) => role === "ROLE_GIANGVIEN")) {
+            console.log("giangvien");
+            navigate("/giang-vien", { replace: true });
+          } else {
+            navigate("/chuyen-vien", { replace: true });
+          }
         }
       } catch (error) {
+        toast.error("Tài khoản mật khẩu không chính xác");
         console.log(error);
       }
     };
@@ -152,11 +157,9 @@ const HomeIn = () => {
       </div>
       <div className="w-[20%] flex items-center justify-center bg-gradient-to-r from-[#D0E1FC] to-[#72D1FA] rounded-lg">
         <div className="w-full h-[620px] border-[2px] rounded-lg flex flex-col items-center gap-3">
-          <img
-            src="https://firebasestorage.googleapis.com/v0/b/music-ed1de.appspot.com/o/congthongtinsinhvien.png?alt=media&token=6b9bacc6-20c6-4090-a879-b42ba8564c8e&_gl=1*r6idoc*_ga*Njk0MjA5MDAzLjE2OTgwODYwNjA.*_ga_CW55HF8NVT*MTY5ODIwNzI4NC40LjEuMTY5ODIwNzI5Ny40Ny4wLjA."
-            alt="img"
-            className="mt-[30px]"
-          />
+          <span className="mt-5 text-[22px] font-medium text-[#005AB7]">
+            TÀI CHÍNH ĐÀO TẠO
+          </span>
           <p className="font-bold text-[20px] text-[#005AB7]">ĐĂNG NHẬP</p>
           <div className="flex flex-col items-center justify-center">
             <FormControl sx={{ m: 1, width: "30ch" }} variant="outlined">

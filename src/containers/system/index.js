@@ -7,3 +7,5 @@ export { default as LecturePrice } from "./LecturePrice";
 export { default as Invoice } from "./Invoice";
 export { default as TeachingPeriod } from "./TeachingPeriod";
 export { default as StudentExpenses } from "./StudentExpenses";
+export { default as ChartInvoice } from "./ChartInvoice";
+export { default as ChartTeachingPeriod } from "./ChartTeachingPeriod";

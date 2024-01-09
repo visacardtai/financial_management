@@ -17,6 +17,9 @@ import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 
 import * as apis from "../../apis";
 import * as helpFn from "../../util/HelpFn";
+import useAxiosPrivate from "../../hooks/useAxiosPrivate";
+import pathApis from "../../apis/PathApi";
+import { useSelector } from "react-redux";
 
 const total = (details) => {
   let sumCredit = 0;
@@ -60,9 +63,7 @@ function Row(props) {
             ? helpFn.convertDateFormat(row?.completion_date)
             : "Đang xử lý"}
         </TableCell>
-        <TableCell align="center">
-          {helpFn.converVND(total(row?.expensesDetails)[1])}
-        </TableCell>
+        <TableCell align="center">{helpFn.converVND(row?.total)}</TableCell>
       </TableRow>
       <TableRow>
         <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={8}>
@@ -110,6 +111,8 @@ function Row(props) {
 }
 
 const Receipt = () => {
+  const { idUser } = useSelector((state) => state.app);
+  const axiosPrivate = useAxiosPrivate();
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(10);
 
@@ -124,9 +127,18 @@ const Receipt = () => {
 
   const [studentExpenses, setStudentExpenses] = useState([]);
   useEffect(() => {
+    const controller = new AbortController();
     const fetchCheck = async () => {
       try {
-        const response = await apis.apiGetExpensesByIdStudent(1);
+        const response = await axiosPrivate.get(
+          pathApis.GETALLSTUDENTEXPENSES,
+          {
+            signal: controller.signal,
+            params: { studentId: idUser },
+          }
+        );
+
+        // const response = await apis.apiGetExpensesByIdStudent(1);
         console.log(response);
         if (response?.status === 200) {
           setStudentExpenses(response?.data);
@@ -144,7 +156,7 @@ const Receipt = () => {
       <div className="w-[100%] bg-white flex flex-col justify-center items-center">
         <div className="flex items-center justify-between mx-5 mt-2 border-b-2 p-2 w-[96%]">
           <div className="text-[22px] font-bold text-main-100">
-            <p>Khoản chi sinh viên</p>
+            <p>Học bổng và khoản trợ cấp</p>
           </div>
         </div>
         <div className="w-[96%] m-auto mt-6">

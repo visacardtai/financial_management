@@ -1,6 +1,11 @@
 import actionTypes from "../actions/actionTypes";
 
 const initState = {
+  isLoading: false,
+  infoUser: {},
+  idUser: null,
+  refreshBe: false,
+  role: [],
   home: false,
   isLogin: false,
   isBlur: false,
@@ -10,54 +15,25 @@ const initState = {
   editInvoice: null,
   editTeachingPeriod: null,
   listDelete: [],
+  typeUpload: null,
+  dataCalculate: {},
 };
 
 const appReducer = (state = initState, action) => {
   switch (action.type) {
+    case actionTypes.SETROLE:
+      return { ...state, role: action.data || [] };
+    case actionTypes.REFRESHFE:
+      return { ...state, refreshBe: action.flag };
+    case actionTypes.INFOUSER:
+      return { ...state, infoUser: action.data };
+    case actionTypes.IDUSER:
+      return { ...state, idUser: action.data };
     case actionTypes.ISLOGIN:
       return {
         ...state,
         isLogin: action.flag,
       };
-    // case actionTypes.GET_HOME:
-    //   return {
-    //     ...state,
-    //     // banner:
-    //     //   action.homeData?.find((item) => item.sectionId === "hSlider")
-    //     //     ?.items || null,
-    //     banner: action.homeData.slice(0, 5) || null,
-    //     Friday: action.homeData.slice(6, 11) || null,
-    //     hArtistTheme: action.homeData.slice(12, 17) || null,
-    //     hEditorTheme: action.homeData?.slice(18, 23) || null,
-
-    //     h100: action.homeData.slice(24, 29) || null,
-    //     hAlbum: action.homeData.slice(30, 35) || null,
-    //   };
-    // case actionTypes.NEW_RELEASE:
-    //   return {
-    //     ...state,
-    //     newRelease: action.newrelease || {},
-    //   };
-    // case actionTypes.LOADING:
-    //   return {
-    //     ...state,
-    //     isLoading: action.flag,
-    //   };
-    // case actionTypes.NEW_SONG:
-    //   return {
-    //     ...state,
-    //     newSong: action.newsong || {},
-    //   };
-    // case actionTypes.ALBUM:
-    //   return {
-    //     ...state,
-    //     album: action.album || {},
-    //   };
-    // case actionTypes.GENRE:
-    //   return {
-    //     ...state,
-    //     genre: action.genre || {},
-    //   };
     case actionTypes.ISBLUR:
       return { ...state, isBlur: action.flag };
     case actionTypes.TYPEDELETE:
@@ -74,6 +50,15 @@ const appReducer = (state = initState, action) => {
       return { ...state, editInvoice: action.data || null };
     case actionTypes.EDITTEACHINGPERIOD:
       return { ...state, editTeachingPeriod: action.data || null };
+    case actionTypes.TYPEUPLOAD:
+      return { ...state, typeUpload: action.data };
+    case actionTypes.DATACALCULATE:
+      return { ...state, dataCalculate: action.data };
+    case actionTypes.LOADING:
+      return {
+        ...state,
+        isLoading: action.flag,
+      };
     default:
       return state;
   }

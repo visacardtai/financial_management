@@ -2,7 +2,7 @@ import React from "react";
 import { Outlet } from "react-router-dom";
 
 import Header from "../Header";
-import { Sidebar } from "../../../components";
+import { SidebarLec } from "../../../components/lecturer";
 
 const PubLecturer = () => {
   return (
@@ -11,7 +11,7 @@ const PubLecturer = () => {
         <Header />
         <div className="w-full h-full flex pt-[72px]">
           <div className="w-[10%] ">
-            <Sidebar />
+            <SidebarLec />
           </div>
           <div className="w-[80%] flex-auto h-full">
             <Outlet />

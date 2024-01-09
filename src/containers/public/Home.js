@@ -17,7 +17,7 @@ const Home = () => {
         <Infor />
         <Group />
       </div>
-      <div className="h-[360px] flex gap-3 mb-3">
+      <div className="h-[320px] flex gap-3 mb-3">
         <ProgressCard />
         <TermCard />
         <ResultCard />

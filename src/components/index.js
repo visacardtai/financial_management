@@ -10,3 +10,4 @@ export { default as DropDown } from "./DropDown";
 export { default as SubMenu } from "./SubMenu";
 export { default as Sidebar } from "./Sidebar";
 export { default as BGBlur } from "./BGBlur";
+export { default as Loading } from "./Loading";

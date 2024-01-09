@@ -8,6 +8,7 @@ import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
 import { TableVirtuoso } from "react-virtuoso";
 import * as apis from "../../apis";
+import useAxiosPrivate from "../../hooks/useAxiosPrivate";
 
 const columns = [
   {
@@ -86,11 +87,12 @@ function rowContent(_index, row) {
 }
 
 const AllTargets = () => {
+  const axiosPrivate = useAxiosPrivate();
   const [allTargets, setAllTargets] = useState(null);
   useEffect(() => {
     const fetchClassCoefficient = async () => {
       try {
-        const response = await apis.apiGetAllTargets();
+        const response = await apis.apiGetAllTargets(axiosPrivate);
         if (response?.status === 200) {
           setAllTargets(response?.data);
           console.log(response?.data);

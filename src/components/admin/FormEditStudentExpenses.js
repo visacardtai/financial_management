@@ -14,12 +14,19 @@ import { CiCirclePlus } from "react-icons/ci";
 import { GoTrash } from "react-icons/go";
 import * as helpFn from "../../util/HelpFn";
 import { useSelector } from "react-redux";
+import useAxiosPrivate from "../../hooks/useAxiosPrivate";
+import { toast } from "react-toastify";
+import { BiBarChartAlt2 } from "react-icons/bi";
+import { BiFontColor } from "react-icons/bi";
 
 const { MdOutlineDriveFileRenameOutline, BiBookmarkAltPlus, BiCheckDouble } =
   icons;
 
 const FormEditStudentExpenses = () => {
-  const { studentExpenses } = useSelector((state) => state.app);
+  const axiosPrivate = useAxiosPrivate();
+  const { studentExpenses, refreshBe, isBlur } = useSelector(
+    (state) => state.app
+  );
   const [...dataDetails] = studentExpenses?.expensesDetails?.map(
     (item) => item?.expensesPrice
   );
@@ -57,7 +64,7 @@ const FormEditStudentExpenses = () => {
   useEffect(() => {
     const fetchApi = async () => {
       try {
-        const response = await apis.apiGetAllStudent();
+        const response = await apis.apiGetAllStudent(axiosPrivate);
         if (response?.status === 200) {
           setStudent(response?.data);
         }
@@ -73,7 +80,7 @@ const FormEditStudentExpenses = () => {
   useEffect(() => {
     const fetchApi = async () => {
       try {
-        const response = await apis.apiGetAllSemester();
+        const response = await apis.apiGetAllSemester(axiosPrivate);
         if (response?.status === 200) {
           setSemester(response?.data);
         }
@@ -89,7 +96,7 @@ const FormEditStudentExpenses = () => {
   useEffect(() => {
     const fetchApi = async () => {
       try {
-        const response = await apis.apiGetExpPriceByStatus(1);
+        const response = await apis.apiGetExpPriceNew(axiosPrivate);
         if (response?.status === 200) {
           setExpensesPrice(response?.data);
         }
@@ -108,18 +115,25 @@ const FormEditStudentExpenses = () => {
         const different1 = original.filter((number) => !data.includes(number));
         const different2 = data.filter((number) => !original.includes(number));
         const different = [...different1, ...different2];
-        console.log(different);
-        const response = await apis.apiEditStudentExpenses(
-          studentExpenses?.id,
+        const dataEdit = {
+          id: studentExpenses?.id,
           name,
-          itemStudent,
-          itemSemester,
-          different
+          student_id: itemStudent,
+          semester_id: itemSemester,
+          details: different,
+        };
+        const response = await apis.apiEditStudentExpenses(
+          axiosPrivate,
+          dataEdit
         );
         if (response?.status === 200) {
+          toast.success("Sửa dữ liệu thành công");
+          dispatch(actions.refreshBe(!refreshBe));
+          dispatch(actions.checkBlur(!isBlur));
           console.log("success");
         }
       } catch (error) {
+        toast.error("Sửa dữ liệu thất bại");
         console.log(error);
       }
     };
@@ -154,7 +168,7 @@ const FormEditStudentExpenses = () => {
     <div className="w-full h-full font-roboto ">
       <div className="bg-sky-400 w-full rounded-t-xl">
         <h5 className="font-medium text-[20px] py-3">
-          Thêm Hóa Đơn Chi Sinh Viên
+          Chỉnh Sửa Hóa Đơn Chi Sinh Viên
         </h5>
       </div>
       <div className="flex mt-6 h-[70%]">
@@ -173,7 +187,7 @@ const FormEditStudentExpenses = () => {
           </div>
           <div className="flex justify-start items-center w-[80%] gap-2">
             <div className="flex w-[30%] gap-2">
-              <BiBookmarkAltPlus size={24} />
+              <BiBarChartAlt2 size={24} />
               <p>Kỳ</p>
             </div>
             <FormControl sx={{ m: 1, minWidth: 220 }} size="small">
@@ -196,7 +210,7 @@ const FormEditStudentExpenses = () => {
           </div>
           <div className="flex justify-start items-center w-[80%] gap-2">
             <div className="flex w-[30%] gap-2">
-              <BiBookmarkAltPlus size={24} />
+              <BiFontColor size={24} />
               <p>Mã SV</p>
             </div>
             <FormControl sx={{ m: 1, minWidth: 220 }} size="small">

@@ -24,6 +24,9 @@ import Select from "@mui/material/Select";
 import icons from "../../util/icons";
 import * as apis from "../../apis";
 import * as helpFn from "../../util/HelpFn";
+import useAxiosPrivate from "../../hooks/useAxiosPrivate";
+import pathApis from "../../apis/PathApi";
+import { useSelector } from "react-redux";
 
 const { BiPrinter } = icons;
 
@@ -168,6 +171,8 @@ function Row(props) {
 // ];
 
 const Debt = () => {
+  const { idUser } = useSelector((state) => state.app);
+  const axiosPrivate = useAxiosPrivate();
   const [age, setAge] = React.useState("Tất cả");
 
   const handleChange = (event) => {
@@ -190,10 +195,30 @@ const Debt = () => {
   useEffect(() => {
     const fetchCheck = async () => {
       try {
-        const response = await apis.apiGetInvoiceByStatus(1, 1);
+        const response = await axiosPrivate.get(pathApis.GETALLINVOICE, {
+          params: { studentId: idUser, status: 1 },
+        });
         console.log(response);
         if (response?.status === 200) {
           setInvoice(response?.data);
+          console.log(response?.data);
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    };
+    fetchCheck();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const [chart, setChart] = useState(null);
+  useEffect(() => {
+    const fetchCheck = async () => {
+      try {
+        const response = await apis.apiGetChartStudent(axiosPrivate, idUser);
+        console.log(response);
+        if (response?.status === 200) {
+          setChart(response?.data);
           console.log(response?.data);
         }
       } catch (error) {
@@ -267,15 +292,31 @@ const Debt = () => {
             onRowsPerPageChange={handleChangeRowsPerPage}
           />
         </div>
-        <div>
-          <p>Tổng nộp học phí</p>
-          <p>Tổng công nợ</p>
-          <p>Tổng công nợ</p>
-          <p>Tổng công nợ</p>
-          <p>Tổng công nợ</p>
-          <p>Tổng công nợ</p>
-          <p>Tổng công nợ</p>
-        </div>
+        {chart !== null && (
+          <div className="w-[96%] h-[50px] bg-sky-300 flex items-center justify-between mb-2 px-2 rounded-md">
+            <div>
+              <p>Tổng hóa đơn: {chart?.num}</p>
+            </div>
+            <div>
+              <p>Đã thanh toán: {chart?.num - chart?.num_unpaid}</p>
+            </div>
+            <div>
+              <p>Chưa thanh toán: {chart?.num_unpaid}</p>
+            </div>
+            <div>
+              <p>Còn nợ: {helpFn.converVND(chart?.not_retired)}</p>
+            </div>
+            <div>
+              <p>
+                Đã thanh toán:{" "}
+                {helpFn.converVND(chart?.sum - chart?.not_retired)}
+              </p>
+            </div>
+            <div>
+              <p>Tổng tiền: {helpFn.converVND(chart?.sum)}</p>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

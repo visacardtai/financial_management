@@ -27,6 +27,7 @@ import DropDown from "../../components/DropDown";
 
 import * as apis from "../../apis";
 import * as helpFn from "../../util/HelpFn";
+import { toast } from "react-toastify";
 import { redirect } from "react-router-dom";
 const { GoSearch } = icons;
 
@@ -97,11 +98,11 @@ const SearchInvoice = () => {
   const [redirectUrl, setRedirectUrl] = useState("");
   const handleClickPay = async () => {
     try {
+      console.log(invoice[0]?.total, invoice[0]?.id);
       const response = await apis.apiPayment(invoice[0]?.total, invoice[0]?.id);
       console.log(response);
       setRedirectUrl(response?.data);
       if (response?.status === 200) {
-        console.log("abc");
         window.location.href = response?.data;
       }
     } catch (error) {
@@ -118,13 +119,13 @@ const SearchInvoice = () => {
       const fetchCheck = async () => {
         try {
           const response = await apis.apiGetInvoiceByStatus(inputValue, 0);
-          console.log(response);
           if (response?.status === 200) {
             console.log(response);
             setInvoice(response?.data);
             if (response?.data?.length > 0) {
               setfirst(true);
             } else {
+              toast.success("Bạn đã thanh toán hết hóa đơn");
               setfirst(false);
             }
           }
@@ -317,11 +318,12 @@ const SearchInvoice = () => {
                         </div>
                         <div className="flex justify-between border-b-[1px] py-3">
                           <p>Mã sinh viên</p>
-                          <p>N19DCCN164</p>
+                          <p>{invoice?.[0]?.student_id}</p>
                         </div>
                         <div className="flex justify-between border-b-[1px] py-3">
                           <p>Họ tên</p>
-                          <p>Nguyễn Tiến Tài</p>
+
+                          <p>{invoice?.[0]?.student_name}</p>
                         </div>
                         <div className="flex justify-between border-b-[1px] py-3">
                           <p>Ngân hàng</p>

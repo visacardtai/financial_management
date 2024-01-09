@@ -18,6 +18,9 @@ import { useEffect, useState } from "react";
 
 import * as apis from "../../apis";
 import * as helpFn from "../../util/HelpFn";
+import useAxiosPrivate from "../../hooks/useAxiosPrivate";
+import icons from "../../util/icons";
+const { GoSearch } = icons;
 
 function createData(id, name, calories, fat, carbs, protein) {
   return {
@@ -227,20 +230,32 @@ EnhancedTableToolbar.propTypes = {
 };
 
 const TableStudentExpenses = () => {
+  const axiosPrivate = useAxiosPrivate();
   const [order, setOrder] = React.useState("asc");
   const [orderBy, setOrderBy] = React.useState("calories");
   const [selected, setSelected] = React.useState([]);
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(5);
   const [expPrice, setExpPrice] = useState([]);
+  const [dataSearch, setDataSearch] = useState([]);
+  const [inputValue, setInputValue] = useState("");
 
   useEffect(() => {
     const fetchApi = async () => {
       try {
-        const response = await apis.apiGetAllStudentExpenses(1, 1);
+        const response = await apis.apiGetAllStudentExpenses(
+          axiosPrivate,
+          1,
+          1
+        );
         if (response?.status === 200) {
           console.log(response);
           setExpPrice(response?.data);
+
+          const filteredStudents = response?.data?.filter((item) =>
+            item?.name.toLowerCase().includes(inputValue.toLowerCase())
+          );
+          setDataSearch(filteredStudents);
         }
       } catch (error) {
         console.log(error);
@@ -300,15 +315,43 @@ const TableStudentExpenses = () => {
 
   const visibleRows = React.useMemo(
     () =>
-      stableSort(expPrice, getComparator(order, orderBy)).slice(
+      stableSort(dataSearch, getComparator(order, orderBy)).slice(
         page * rowsPerPage,
         page * rowsPerPage + rowsPerPage
       ),
-    [order, orderBy, page, rowsPerPage, expPrice]
+    [order, orderBy, page, rowsPerPage, dataSearch]
   );
 
+  const handleChangeInput = (event) => {
+    setInputValue(event.target.value);
+  };
+  const handlePrint = () => {
+    const filteredStudents = expPrice.filter((item) =>
+      item?.student_name.toLowerCase().includes(inputValue.toLowerCase())
+    );
+    setDataSearch(filteredStudents);
+  };
+
+  useEffect(() => {
+    handlePrint();
+  }, [inputValue]);
+
   return (
-    <div className="w-full flex justify-center">
+    <div className="w-full flex flex-col items-center relative font-roboto">
+      <div className="absolute right-[5%] top-[-55px] flex gap-3 justify-center items-center">
+        <div className="flex gap-2 justify-center items-center">
+          <div className="bg-[#f8fbfd] flex items-center justify-center border px-2 gap-2 rounded-full">
+            <GoSearch size={24} />
+            <input
+              className="py-2 bg-[#f8fbfd] focus:outline-none"
+              type="text"
+              placeholder="Nhập mã sinh viên"
+              value={inputValue}
+              onChange={handleChangeInput}
+            />
+          </div>
+        </div>
+      </div>
       <div className="w-[90%]">
         <Box sx={{ width: "100%" }}>
           <Paper sx={{ width: "100%", mb: 2 }}>
@@ -324,7 +367,7 @@ const TableStudentExpenses = () => {
                   orderBy={orderBy}
                   onSelectAllClick={handleSelectAllClick}
                   onRequestSort={handleRequestSort}
-                  rowCount={expPrice.length}
+                  rowCount={dataSearch.length}
                 />
                 <TableBody>
                   {visibleRows?.map((row, index) => {
@@ -379,7 +422,7 @@ const TableStudentExpenses = () => {
             <TablePagination
               rowsPerPageOptions={[5, 10, 15]}
               component="div"
-              count={expPrice.length}
+              count={dataSearch.length}
               rowsPerPage={rowsPerPage}
               page={page}
               onPageChange={handleChangePage}
